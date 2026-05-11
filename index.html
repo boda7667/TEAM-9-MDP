@@ -15,7 +15,7 @@
     apiKey: "AIzaSyDQts2-RMEYkl201x-jv7nhWPlJsskAnB4",
     authDomain: "team-9-mdp.firebaseapp.com",
     projectId: "team-9-mdp",
-    storageBucket: "team-9-mdp.firebasestorage.app",
+    storageBucket: "team-9-mdp.appspot.com",  // Fixed: Use .appspot.com for CORS compatibility
     messagingSenderId: "217973676031",
     appId: "1:217973676031:web:171e3be8df3a417441f9ca",
     measurementId: "G-GDHMR1CBTF"
@@ -609,7 +609,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDQts2-RMEYkl201x-jv7nhWPlJsskAnB4",
   authDomain: "team-9-mdp.firebaseapp.com",
   projectId: "team-9-mdp",
-  storageBucket: "team-9-mdp.firebasestorage.app",
+  storageBucket: "team-9-mdp.appspot.com",  // Fixed: Use .appspot.com for CORS compatibility
   messagingSenderId: "217973676031",
   appId: "1:217973676031:web:171e3be8df3a417441f9ca",
   measurementId: "G-GDHMR1CBTF"
@@ -793,18 +793,49 @@ function setupRealtimeListener(collectionName, docId, callback) {
   }
 }
 
-// Upload image to Firebase Storage and return URL
+// Upload image to Firebase Storage using SDK only (NO XMLHttpRequest or fetch)
 async function uploadImage(file) {
+  if (!file) {
+    console.warn('[uploadImage] No file provided');
+    return '';
+  }
+
+  // Validate file type and size
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+
+  if (!allowedTypes.includes(file.type)) {
+    console.error('[uploadImage] Invalid file type:', file.type);
+    notify('⚠️ يرجى اختيار صورة بصيغة صحيحة (JPG, PNG, GIF, WebP)');
+    return '';
+  }
+
+  if (file.size > maxSize) {
+    console.error('[uploadImage] File too large:', file.size);
+    notify('⚠️ حجم الصورة كبير جداً (الحد الأقصى 5 ميجابايت)');
+    return '';
+  }
+
   try {
+    console.log('[uploadImage] Starting upload for file:', file.name);
+
+    // Create storage reference in images/ folder
     const { ref, uploadBytes, getDownloadURL, storage } = fbConfig;
-    const storageRef = ref(storage, `images/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(storageRef);
-    console.log('[uploadImage] Image uploaded successfully:', downloadURL);
+    const storageRef = ref(storage, `images/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
+
+    // Upload the file using Firebase SDK
+    console.log('[uploadImage] Uploading bytes...');
+    const snapshot = await uploadBytes(storageRef, file);
+    console.log('[uploadImage] Upload successful, getting download URL...');
+
+    // Get the download URL
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    console.log('[uploadImage] Download URL obtained:', downloadURL);
+
     return downloadURL;
   } catch (error) {
-    console.error('[uploadImage] Error uploading image:', error);
-    notify('⚠️ خطأ في رفع الصورة');
+    console.error('[uploadImage] Firebase Storage upload failed:', error);
+    notify('⚠️ خطأ في رفع الصورة: ' + error.message);
     return '';
   }
 }

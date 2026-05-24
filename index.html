@@ -1,0 +1,370 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MDP181 — Reverse Engineering Platform</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="sitehead">
+    <div class="container">
+      <div class="logo">MDP181 — Reverse Engineering</div>
+      <nav>
+        <a href="#overview">Overview</a>
+        <a href="#disassembly">Disassembly</a>
+        <a href="#materials">Materials</a>
+        <a href="#components">Components</a>
+        <a href="#manufacturing">Manufacturing</a>
+        <a href="#media">Media</a>
+        <a href="#model">3D Model</a>
+        <a href="#conclusion">Conclusions</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Hero Intro Video">
+      <div class="hero-video-wrap">
+        <iframe id="hero-video" src="https://www.youtube.com/embed/iZSwlZ-T_e8?autoplay=1&mute=1&loop=1&playlist=iZSwlZ-T_e8&controls=0&modestbranding=1&rel=0&showinfo=0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen title="MDP181 Reverse Engineering Intro Video"></iframe>
+        <div class="hero-overlay">
+          <div class="hero-eyebrow">Engineering Capstone</div>
+          <h1 class="hero-title">MDP181: Reverse Engineering Report</h1>
+          <p class="hero-subtitle" id="hero-subtitle">Production Engineering — Ain Shams University</p>
+          <p class="hero-copy" id="hero-description">Production Engineering — Ain Shams University. A cinematic platform for reverse-engineering analysis, materials profiling, component functions and manufacturing workflow visualization.</p>
+          <div class="hero-actions">
+            <button id="mute-toggle" class="btn btn-primary">Unmute</button>
+            <a href="#overview" class="btn btn-outline">Scroll to Project</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="disassembly" class="section" data-reveal>
+      <div class="container">
+        <div class="section-grid">
+          <div>
+            <p class="badge">Disassembly</p>
+            <h2 class="section-title">Disassembly Inventory</h2>
+            <p class="section-copy">The reverse-engineering report itemizes each major part, its function, and the role it plays in the assembly.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>Disassembled Components</h3>
+            <table class="materials-table">
+              <thead>
+                <tr><th>Part</th><th>Component</th><th>Function</th><th>Role</th></tr>
+              </thead>
+              <tbody id="disassembly-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview" class="section" data-reveal>
+      <div class="container">
+        <div class="section-grid">
+          <div>
+            <p class="badge">Project Snapshot</p>
+            <h2 class="section-title">Overview</h2>
+            <p class="section-copy">Reverse-engineering study documenting disassembly, materials identification, component function, and manufacturing process mapping for electromechanical consumer assemblies.</p>
+            <div class="stats-grid">
+              <div class="stat-card card card-compact">
+                <div class="stat-value" id="component-count">0</div>
+                <div class="stat-label">Core Components</div>
+              </div>
+              <div class="stat-card card card-compact">
+                <div class="stat-value" id="manufacturing-stages-count">0</div>
+                <div class="stat-label">Manufacturing Stages</div>
+              </div>
+              <div class="stat-card card card-compact">
+                <div class="stat-value" id="material-families-count">0</div>
+                <div class="stat-label">Material Families</div>
+              </div>
+            </div>
+          </div>
+          <div class="card card-compact">
+            <h3>Objectives</h3>
+            <ul class="objective-list" id="objectives-list">
+              <li class="objective-item">Disassemble and identify functional components and their roles.</li>
+              <li class="objective-item">Determine materials and justify selection via engineering tests.</li>
+              <li class="objective-item">Map manufacturing sequences for individual components.</li>
+              <li class="objective-item">Produce consolidated technical documentation and process visualization.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card card-compact" style="margin-top:24px;">
+          <h3>System Workflow</h3>
+          <ul class="workflow-list" id="workflow-list">
+            <li class="workflow-item"><strong>Power intake and protection:</strong> plug, filter cap.</li>
+            <li class="workflow-item"><strong>Electrical distribution:</strong> wires, capacitors, switches.</li>
+            <li class="workflow-item"><strong>Energy conversion:</strong> motor & armature.</li>
+            <li class="workflow-item"><strong>Heat generation & control:</strong> heating coil and MICA board.</li>
+            <li class="workflow-item"><strong>Air movement and direction:</strong> impeller, airflow director.</li>
+            <li class="workflow-item"><strong>Output & user interface:</strong> nozzle, buttons, housing.</li>
+          </ul>
+        </div>
+        <div class="card card-compact" style="margin-top:24px;">
+          <h3>Project Notes</h3>
+          <p class="section-copy" id="report-notes">Source: MDP181 reverse-engineering report uploaded by user. Data auto-extracted and organized into machine-readable JSON for site population and diagram generation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="materials" class="section" data-reveal>
+      <div class="container">
+        <div class="section-grid">
+          <div>
+            <p class="badge">Materials</p>
+            <h2 class="section-title">Materials & Engineering Rationale</h2>
+            <p class="section-copy">Materials selection is mapped to electrical, thermal and manufacturability requirements across the assembly.</p>
+            <table class="materials-table">
+              <thead>
+                <tr><th>Material</th><th>Engineering Rationale</th></tr>
+              </thead>
+              <tbody id="materials-table-body">
+                <tr><td>Nickel-Chrome</td><td>High resistivity and oxidation resistance — suitable for heating elements.</td></tr>
+                <tr><td>Muscovite MICA</td><td>High thermal stability and dielectric strength — insulation.</td></tr>
+                <tr><td>Thermoplastic</td><td>Lightweight, moldable, corrosion-resistant — mass-producible parts.</td></tr>
+                <tr><td>Graphite</td><td>Self-lubricating electrical contact for brushes.</td></tr>
+                <tr><td>Silicon Steel</td><td>Low core losses for magnetic circuits.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card card-compact">
+            <h3>Material Distribution</h3>
+            <div class="pie-chart" id="materials-chart"></div>
+          </div>
+          <div class="card card-compact">
+            <h3>Component Category Distribution</h3>
+            <div class="category-bar-chart" id="component-category-chart"></div>
+          </div>
+        </div>
+        <div class="card card-compact" style="margin-top:24px;">
+          <h3>Material → Component Mapping</h3>
+          <table class="materials-table">
+            <thead>
+              <tr><th>Material</th><th>Used In Components</th></tr>
+            </thead>
+            <tbody id="material-mapping-body"></tbody>
+          </table>
+        </div>
+          <div class="container" style="margin-top:24px;">
+            <div class="card card-compact">
+              <h3>Materials Identification</h3>
+              <table class="materials-table">
+                <thead>
+                  <tr><th>Part</th><th>Test Method</th><th>Justification</th><th>Material</th></tr>
+                </thead>
+                <tbody id="material-identification-body"></tbody>
+              </table>
+            </div>
+          </div>
+      </div>
+    </section>
+
+    <section id="components" class="section" data-reveal>
+      <div class="container">
+        <div class="section-grid">
+          <div>
+            <p class="badge">Components</p>
+            <h2 class="section-title">Component Catalog</h2>
+            <p class="section-copy">Eight core subassemblies are documented with their function, material, and manufacturing route.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>System Relationship</h3>
+            <div class="iframe-frame">
+              <div class="mermaid" id="architecture-graph">graph LR; A[Power Input] --> B[Electrical Distribution]; B --> C[Motor & Armature]; C --> D[Air Movement]; D --> E[Output Interface]; B --> F[Heating Coil]; F --> G[MICA Board];</div>
+            </div>
+          </div>
+        </div>
+        <div class="card card-compact" style="margin-top:24px;">
+          <h3>Component → Material Relationship</h3>
+          <div class="iframe-frame">
+            <div class="mermaid" id="component-material-graph">graph LR;</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2" style="margin-top:24px;" id="components-grid">
+          <div class="card card-compact">
+            <h3>Heating Coil</h3>
+            <p><strong>Material:</strong> Nickel-Chrome</p>
+            <p><strong>Function:</strong> Converts electrical energy into thermal energy.</p>
+            <p><strong>Manufacturing:</strong> Alloying → Wire Drawing → Coiling.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>MICA Board</h3>
+            <p><strong>Material:</strong> Muscovite MICA</p>
+            <p><strong>Function:</strong> High-temperature insulation and support.</p>
+            <p><strong>Manufacturing:</strong> Splitting/Flaking → Lamination → Punching.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>Impeller</h3>
+            <p><strong>Material:</strong> Thermoplastic</p>
+            <p><strong>Function:</strong> Air circulation.</p>
+            <p><strong>Manufacturing:</strong> Injection Molding.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>Carbon Brush Assembly</h3>
+            <p><strong>Materials:</strong> Graphite, spring steel, copper.</p>
+            <p><strong>Function:</strong> Transfer current to commutator.</p>
+            <p><strong>Manufacturing:</strong> Powder compaction & sintering; wire drawing.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>Plastic Gears</h3>
+            <p><strong>Material:</strong> Thermoplastic</p>
+            <p><strong>Function:</strong> Motion transmission.</p>
+            <p><strong>Manufacturing:</strong> Injection Molding.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>Capacitor</h3>
+            <p><strong>Material:</strong> Aluminum / Foil / Plastic.</p>
+            <p><strong>Function:</strong> Energy storage and filtering.</p>
+            <p><strong>Manufacturing:</strong> Rolling → Blanking → Etching → Assembly.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>Motor & Armature</h3>
+            <p><strong>Material:</strong> Silicon Steel / Enamelled Copper.</p>
+            <p><strong>Function:</strong> Convert electrical energy to mechanical rotation.</p>
+            <p><strong>Manufacturing:</strong> Core blanking → Winding → Assembly.</p>
+          </div>
+          <div class="card card-compact">
+            <h3>Chassis & Housing</h3>
+            <p><strong>Materials:</strong> Low Carbon Steel / Thermoplastic.</p>
+            <p><strong>Function:</strong> Structural support and EMI grounding.</p>
+            <p><strong>Manufacturing:</strong> Rolling → Blanking → Deep Drawing; Injection Molding.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="manufacturing" class="section" data-reveal>
+      <div class="container">
+        <div class="section-grid">
+          <div>
+            <p class="badge">Manufacturing</p>
+            <h2 class="section-title">Manufacturing Workflow</h2>
+            <p class="section-copy">Process stages are consolidated for the assembly, from raw-material preparation through final testing and calibration.</p>
+            <div class="timeline">
+              <div class="timeline-item"><strong>Raw material prep:</strong> Rolling, Alloying, Extrusion, Lamination.</div>
+              <div class="timeline-item"><strong>Primary forming:</strong> Injection Molding, Deep Drawing, Wire Drawing, Cold Heading.</div>
+              <div class="timeline-item"><strong>Secondary ops:</strong> Trimming, Grinding, Heat Treatment, Surface Finishing.</div>
+              <div class="timeline-item"><strong>Sub-assembly:</strong> Winding, Brush Assembly, Press-fit components.</div>
+              <div class="timeline-item"><strong>Final assembly & testing:</strong> Mechanical assembly, electrical functional testing.</div>
+            </div>
+          </div>
+          <div class="card card-compact">
+            <h3>Process Diagram</h3>
+            <div class="iframe-frame">
+              <div class="mermaid" id="manufacturing-graph">graph TB; R[Raw material prep] --> P[Primary forming] --> S[Secondary ops] --> A[Sub-assembly] --> T[Final assembly & testing];</div>
+            </div>
+          </div>
+        </div>
+        <div class="container" style="margin-top:24px;">
+          <div class="card card-compact">
+            <h3>Manufacturing Details</h3>
+            <table class="materials-table">
+              <thead>
+                <tr><th>Part</th><th>Process Steps</th><th>Notes</th></tr>
+              </thead>
+              <tbody id="manufacturing-details-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="media" class="section" data-reveal>
+      <div class="container">
+        <div class="section-grid">
+          <div class="card card-compact">
+            <p class="badge">Podcast</p>
+            <h2 class="section-title">Engineering Podcast</h2>
+            <p class="section-copy">A SoundCloud briefing on the report, design choices, and manufacturing review.</p>
+            <div class="iframe-frame" style="min-height:180px;">
+              <iframe width="100%" height="166" scrolling="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2326350512&auto_play=false" frameborder="0" allow="autoplay"></iframe>
+            </div>
+          </div>
+          <div class="card card-compact">
+            <p class="badge">Presentation</p>
+            <h2 class="section-title">Engineering Project Presentation</h2>
+            <p class="section-copy">Full technical presentation restored with a responsive viewer and external fallback.</p>
+            <div class="iframe-frame" style="min-height:260px;">
+              <iframe src="https://drive.google.com/file/d/1y1tkOhPNm5lz4PhWko7F5BdwSenHaXGY/preview" allowfullscreen title="Engineering Project Presentation"></iframe>
+            </div>
+            <div class="fallback-panel" style="margin-top:16px;">
+              <p>If the embedded viewer is blocked, open the presentation directly.</p>
+              <a href="https://drive.google.com/file/d/1y1tkOhPNm5lz4PhWko7F5BdwSenHaXGY/preview" target="_blank" class="btn btn-outline">Open Presentation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="model" class="section" data-reveal>
+      <div class="container">
+        <div class="section-grid">
+          <div>
+            <p class="badge">3D Model</p>
+            <h2 class="section-title">Interactive 3D Engineering Model</h2>
+            <p class="section-copy">Embedded Onshape model with fallback button, full-screen instructions, and a stable container.</p>
+            <div class="model-actions">
+              <a href="https://cad.onshape.com/documents/1b16d8c7604a6296a7a5c4c8/w/60671ee82a98298d6daaff5f/e/7c38a3dc0d21f57963cbec30?renderMode=0" target="_blank" class="btn btn-primary">Open 3D Model</a>
+              <span class="section-copy" style="margin:0;align-self:center;">Zoom with mouse wheel, rotate by dragging, use full-screen after load.</span>
+            </div>
+          </div>
+          <div class="model-card iframe-frame">
+            <iframe src="https://cad.onshape.com/documents/1b16d8c7604a6296a7a5c4c8/w/60671ee82a98298d6daaff5f/e/7c38a3dc0d21f57963cbec30?renderMode=0" allowfullscreen title="Onshape 3D Model Viewer"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="conclusion" class="section" data-reveal>
+      <div class="container">
+        <div class="section-grid">
+          <div>
+            <p class="badge">Conclusions</p>
+            <h2 class="section-title">Final Findings</h2>
+            <p class="section-copy">The recovered platform now contains the full engineering story: components, materials, manufacturing, media, and model assets.</p>
+            <ul class="features-list" id="conclusions-list">
+              <li class="workflow-item">Comprehensive component, material, and process database produced for redesign and cost studies.</li>
+              <li class="workflow-item">Common manufacturing techniques include injection molding, deep drawing, rolling, coil winding, and wire drawing.</li>
+              <li class="workflow-item">Next step: collect dimensional and electrical measurements to complete engineering calculations and verifications.</li>
+            </ul>
+          </div>
+          <div class="card card-compact">
+            <h3>Verification Roadmap</h3>
+            <p class="section-copy">Next step: collect dimensional and electrical measurements to complete engineering calculations and verifications.</p>
+          </div>
+        </div>
+        <div class="card card-compact" style="margin-top:24px;">
+          <h3>Team Information</h3>
+          <p class="section-copy" id="team-note">No team details were provided in the report source.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="sitefoot">
+    <div class="container">
+      <div class="card card-compact" style="background:rgba(255,255,255,.03);border:none;box-shadow:none;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;">
+        <div>
+          <strong>MDP181 Reverse Engineering</strong>
+          <p class="section-copy" style="margin:8px 0 0;">Website Designed & Developed by Abdelrahman Ashraf Abdelrazek - University ID: 2401727.</p>
+          <p class="section-copy" style="margin:8px 0 0;">Data-driven engineering report and stable presentation system for Faculty of Engineering, Ain Shams University.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:220px;">
+          <span class="badge">Safe Recovery Mode</span>
+          <a href="#" style="color:#38bdf8;">Reload report data</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="error-banner">Some enhanced features could not load. Core content remains available.</div>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js" defer onerror="window.mermaidDisabled=true"></script>
+  <script src="assets/report-fallback.js" defer></script>
+  <script src="assets/app.js" defer></script>
+</body>
+</html>

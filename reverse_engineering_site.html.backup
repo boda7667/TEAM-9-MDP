@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDP181 — Reverse Engineering Project</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@r128/examples/js/loaders/STLLoader.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#1a1a2e;
+  --secondary:#16213e;
+  --accent:#0f3460;
+  --gold:#e94560;
+  --gold2:#f5a623;
+  --text:#eaeaea;
+  --text-muted:#9ca3af;
+  --card-bg:rgba(255,255,255,0.04);
+  --card-border:rgba(255,255,255,0.08);
+  --radius:12px;
+  --sidebar:260px;
+}
+body{font-family:'Cairo',sans-serif;background:var(--primary);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden}
+
+/* SIDEBAR */
+#sidebar{
+  position:fixed;right:0;top:0;bottom:0;width:var(--sidebar);
+  background:var(--secondary);border-left:1px solid var(--card-border);
+  display:flex;flex-direction:column;z-index:100;transition:transform .3s;
+}
+.logo{padding:24px 20px;border-bottom:1px solid var(--card-border)}
+.logo h1{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;line-height:1.4}
+.logo p{font-size:11px;color:var(--text-muted);margin-top:4px}
+.nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-section{padding:16px 20px 6px;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted)}
+.nav a{
+  display:flex;align-items:center;gap:10px;padding:10px 20px;
+  color:var(--text-muted);text-decoration:none;font-size:13px;
+  border-right:3px solid transparent;transition:all .2s;cursor:pointer;
+}
+.nav a:hover,.nav a.active{color:var(--text);background:var(--card-bg);border-right-color:var(--gold)}
+.nav a svg{width:16px;height:16px;flex-shrink:0}
+
+/* MAIN */
+#main{margin-right:var(--sidebar);flex:1;min-height:100vh}
+
+/* TOPBAR */
+.topbar{
+  background:var(--secondary);border-bottom:1px solid var(--card-border);
+  padding:14px 32px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.topbar h2{font-size:15px;font-weight:600}
+.badge{background:var(--gold);color:#fff;font-size:10px;padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:1px}
+
+/* PAGES */
+.page{display:none;padding:32px}
+.page.active{display:block}
+
+/* CARDS GRID */
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card-title{font-size:13px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.stat{font-size:32px;font-weight:700;color:var(--gold);font-family:'Orbitron',sans-serif}
+
+/* SECTION TITLES */
+.section-title{font-size:22px;font-weight:700;margin-bottom:8px}
+.section-sub{color:var(--text-muted);font-size:13px;margin-bottom:28px;line-height:1.7}
+.divider{height:1px;background:var(--card-border);margin:28px 0}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--card-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--accent);padding:12px 16px;text-align:right;font-weight:600;font-size:12px;letter-spacing:.5px;white-space:nowrap}
+td{padding:11px 16px;border-bottom:1px solid var(--card-border);color:var(--text-muted);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.03);color:var(--text)}
+td:first-child,th:first-child{font-weight:700;color:var(--text)}
+
+/* SEARCH */
+.search-bar{position:relative;margin-bottom:20px}
+.search-bar input{
+  width:100%;padding:11px 16px;background:var(--card-bg);
+  border:1px solid var(--card-border);border-radius:8px;
+  color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;
+}
+.search-bar input:focus{outline:none;border-color:var(--gold)}
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.filter-btn{
+  padding:7px 16px;border:1px solid var(--card-border);border-radius:20px;
+  background:transparent;color:var(--text-muted);font-family:'Cairo',sans-serif;
+  font-size:12px;cursor:pointer;transition:all .2s;
+}
+.filter-btn:hover,.filter-btn.active{background:var(--gold);border-color:var(--gold);color:#fff}
+
+/* 3D VIEWER */
+.viewer-area{
+  background:var(--secondary);border:1px solid var(--card-border);
+  border-radius:var(--radius);aspect-ratio:16/9;display:flex;
+  align-items:center;justify-content:center;position:relative;overflow:hidden;
+  margin-bottom:20px;
+}
+.viewer-placeholder{text-align:center}
+.viewer-placeholder svg{width:64px;height:64px;color:var(--gold);margin-bottom:12px;opacity:.7}
+.viewer-placeholder h3{font-size:16px;margin-bottom:6px}
+.viewer-placeholder p{font-size:12px;color:var(--text-muted);max-width:280px;line-height:1.6}
+.upload-zone{
+  border:2px dashed var(--card-border);border-radius:var(--radius);
+  padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;
+}
+.upload-zone:hover{border-color:var(--gold);background:rgba(233,69,96,0.05)}
+.upload-zone label{cursor:pointer;display:block}
+.btn{
+  padding:10px 24px;border-radius:8px;font-family:'Cairo',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary{background:var(--gold);color:#fff}
+.btn-primary:hover{background:#c73650}
+.btn-outline{background:transparent;border:1px solid var(--card-border);color:var(--text)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-sm{padding:7px 16px;font-size:12px}
+
+/* VIDEO GRID */
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.video-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden}
+.video-thumb{
+  aspect-ratio:16/9;background:var(--accent);display:flex;
+  align-items:center;justify-content:center;position:relative;cursor:pointer;
+}
+.video-thumb iframe{width:100%;height:100%;border:none}
+.video-thumb .play-btn{
+  width:48px;height:48px;background:var(--gold);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.video-thumb .play-btn svg{width:20px;height:20px;fill:#fff;margin-right:-3px}
+.video-info{padding:14px}
+.video-info h4{font-size:13px;margin-bottom:4px}
+.video-info p{font-size:11px;color:var(--text-muted)}
+.video-actions{padding:0 14px 14px;display:flex;gap:8px}
+
+/* PARTS SECTION */
+.part-card{
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:var(--radius);padding:16px;transition:all .2s;
+}
+.part-card:hover{border-color:rgba(233,69,96,0.4);transform:translateY(-2px)}
+.part-num{font-family:'Orbitron',sans-serif;font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:8px}
+.part-name{font-size:14px;font-weight:700;margin-bottom:6px}
+.part-meta{font-size:11px;color:var(--text-muted);line-height:1.7}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin:2px 1px}
+.tag-material{background:rgba(245,166,35,0.15);color:var(--gold2)}
+.tag-process{background:rgba(233,69,96,0.15);color:var(--gold)}
+
+/* DASHBOARD CONTROLS */
+.control-group{margin-bottom:24px}
+.control-label{font-size:12px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.color-swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:32px;height:32px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.swatch:hover,.swatch.active{transform:scale(1.1);border-color:#fff}
+.font-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.font-opt{
+  padding:10px;border:1px solid var(--card-border);border-radius:8px;
+  cursor:pointer;text-align:center;font-size:12px;transition:all .2s;
+}
+.font-opt:hover,.font-opt.selected{border-color:var(--gold);color:var(--gold)}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--card-border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:13px}
+.toggle{position:relative;width:44px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{
+  position:absolute;inset:0;background:var(--card-border);border-radius:12px;
+  cursor:pointer;transition:.3s;
+}
+.toggle-slider:before{
+  content:'';position:absolute;width:18px;height:18px;
+  left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;
+}
+.toggle input:checked + .toggle-slider{background:var(--gold)}
+.toggle input:checked + .toggle-slider:before{transform:translateX(20px)}
+
+/* PASSWORD MODAL */
+.password-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center}
+.password-modal.show{display:flex}
+.password-modal-content{background:var(--secondary);border:1px solid var(--card-border);border-radius:var(--radius);padding:40px;width:90%;max-width:350px;text-align:center}
+.password-modal-content h2{font-size:18px;margin-bottom:20px;color:var(--gold)}
+.password-modal-content input{width:100%;padding:12px;margin-bottom:16px;border:1px solid var(--card-border);border-radius:8px;background:var(--primary);color:var(--text);font-family:'Cairo',sans-serif;text-align:center;letter-spacing:2px}
+.password-modal-content input:focus{outline:none;border-color:var(--gold)}
+.password-modal-content .btn{width:100%;justify-content:center;margin-bottom:8px}
+.password-modal-content .btn-close-pwd{background:var(--card-border);color:var(--text)}
+.password-modal-content .btn-close-pwd:hover{background:var(--card-border);opacity:0.8}
+
+/* 3D VIEWER */
+.viewer-3d{width:100%;height:600px;border:1px solid var(--card-border);border-radius:var(--radius);background:var(--primary)}
+
+/* NOTIFICATION */
+.notify{
+  position:fixed;bottom:24px;left:24px;
+  background:var(--accent);border:1px solid var(--card-border);
+  border-radius:var(--radius);padding:14px 20px;font-size:13px;
+  opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:999;
+}
+.notify.show{opacity:1;transform:translateY(0)}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  z-index:200;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--secondary);border:1px solid var(--card-border);
+  border-radius:var(--radius);padding:28px;width:90%;max-width:500px;
+  position:relative;
+}
+.modal-close{
+  position:absolute;top:16px;left:16px;background:none;border:none;
+  color:var(--text-muted);cursor:pointer;font-size:20px;
+}
+.modal h3{margin-bottom:16px;font-size:16px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group textarea,.form-group select{
+  width:100%;padding:10px 14px;background:var(--primary);
+  border:1px solid var(--card-border);border-radius:8px;
+  color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;
+}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--gold)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  #sidebar{transform:translateX(100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-right:0}
+  .grid-2{grid-template-columns:1fr}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--primary)}
+::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="logo">
+    <h1>MDP181</h1>
+    <p>Ain Shams University — Faculty of Engineering</p>
+  </div>
+  <div class="nav">
+    <div class="nav-section">الموقع</div>
+    <a onclick="showPage('home')" class="active" id="nav-home">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      الرئيسية
+    </a>
+    <a onclick="showPage('model3d')" id="nav-model3d">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      النموذج ثلاثي الأبعاد
+    </a>
+    <a onclick="showPage('videos')" id="nav-videos">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23,7 16,12 23,17"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      فيديوهات التصنيع
+    </a>
+    <a onclick="showPage('parts')" id="nav-parts">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      الأجزاء والمكونات
+    </a>
+    <div class="nav-section">الإدارة</div>
+    <a onclick="showPage('dashboard')" id="nav-dashboard">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      لوحة التحكم
+    </a>
+    <a onclick="showPage('team')" id="nav-team">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      الفريق
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div class="topbar">
+    <h2 id="page-title">الرئيسية</h2>
+    <span class="badge">Reverse Engineering</span>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="section-title">مشروع الهندسة العكسية</div>
+    <div class="section-sub">MDP181: Production Engineering — كلية الهندسة، جامعة عين شمس</div>
+    <div class="grid grid-3" style="margin-bottom:28px">
+      <div class="card" style="border-right:3px solid var(--gold)">
+        <div class="card-title">عدد المكونات</div>
+        <div class="stat" id="stat-parts">29</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">جزء تم تحليله</div>
+      </div>
+      <div class="card" style="border-right:3px solid var(--gold2)">
+        <div class="card-title">طرق التعريف</div>
+        <div class="stat">40</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">اختبار مادي</div>
+      </div>
+      <div class="card" style="border-right:3px solid #4ade80">
+        <div class="card-title">عمليات التصنيع</div>
+        <div class="stat">15+</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">عملية موثقة</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">المهام الرئيسية</div></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(233,69,96,0.08);border-radius:8px;cursor:pointer" onclick="showPage('parts')">
+            <div style="width:36px;height:36px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron';font-size:12px;font-weight:700;flex-shrink:0">1</div>
+            <div><div style="font-size:13px;font-weight:600">التفكيك — Disassembly</div><div style="font-size:11px;color:var(--text-muted)">تحليل 29 مكون</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(245,166,35,0.08);border-radius:8px;cursor:pointer" onclick="showPage('parts')">
+            <div style="width:36px;height:36px;background:var(--gold2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron';font-size:12px;font-weight:700;flex-shrink:0;color:#1a1a2e">2</div>
+            <div><div style="font-size:13px;font-weight:600">تحديد المواد — Materials</div><div style="font-size:11px;color:var(--text-muted)">40 اختبار مادي</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(74,222,128,0.08);border-radius:8px;cursor:pointer" onclick="showPage('videos')">
+            <div style="width:36px;height:36px;background:#4ade80;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron';font-size:12px;font-weight:700;flex-shrink:0;color:#1a1a2e">3</div>
+            <div><div style="font-size:13px;font-weight:600">طرق التصنيع — Manufacturing</div><div style="font-size:11px;color:var(--text-muted)">نماذج 3D + فيديوهات</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">أكثر المواد استخداماً</div></div>
+        <div id="materials-chart" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D MODEL PAGE -->
+  <div class="page" id="page-model3d">
+    <div class="section-title">مكتبة النماذج ثلاثية الأبعاد</div>
+    <div class="section-sub">إدارة وتنظيم نماذج CAD وملفات XML/STL مع خصائص متقدمة للعرض والتحليل</div>
+    
+    <!-- QUICK ACTIONS -->
+    <div class="grid grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">📦 حفظ نموذج</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">احفظ رابط نموذج أو ملف محلي للمراجعة لاحقًا</div>
+        <div class="form-group">
+          <label>اسم النموذج</label>
+          <input type="text" id="m-name-quick" placeholder="مثال: Heating Coil Assembly">
+        </div>
+        <div class="form-group">
+          <label>الرابط أو وصف الملف</label>
+          <input type="url" id="m-url-quick" placeholder="https://sketchfab.com/... أو file.sldprt">
+        </div>
+        <div class="form-group">
+          <label>المكون المرتبط</label>
+          <input type="text" id="m-part-quick" placeholder="مثال: Heating Assembly">
+        </div>
+        <button class="btn btn-primary" onclick="addModelQuick()">+ حفظ النموذج</button>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">⬆️ رفع ملف محلي (3DXML/STL/OBJ)</div>
+        <div class="upload-zone" id="model-upload-zone">
+          <label for="model-file-input">
+            <svg style="width:32px;height:32px;margin:0 auto 10px;display:block;color:var(--text-muted)" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div style="font-size:13px;color:var(--text-muted)">.3DXML / .STL / .OBJ / .GLB / .SLDPRT</div>
+          </label>
+          <input type="file" id="model-file-input" accept=".3dxml,.stl,.xml,.obj,.glb,.gltf,.stp,.step,.sldprt,.sldasm,.slddrw" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN PIVOT BOX - 3D VIEWER WITH PROPERTIES -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-header">
+        <div class="card-title">🎯 محرر النماذج ثلاثية الأبعاد (Pivot Viewer)</div>
+        <div style="font-size:11px;color:var(--text-muted)">حدد نموذجًا من القائمة أدناه لعرضه هنا مع خصائصه المتقدمة</div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:16px;height:600px">
+        <!-- 3D VIEWER AREA -->
+        <div id="3d-pivot-viewer" style="background:var(--primary);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative">
+          <div style="text-align:center;color:var(--text-muted);pointer-events:none">
+            <div style="font-size:48px;margin-bottom:12px">📦</div>
+            <div style="font-size:14px">حدد نموذجًا لعرضه هنا</div>
+            <div style="font-size:11px;margin-top:4px">يدعم 3DXML, STL, OBJ, GLB وصيغ CAD أخرى</div>
+          </div>
+        </div>
+        
+        <!-- PROPERTIES PANEL -->
+        <div style="background:var(--secondary);border:1px solid var(--card-border);border-radius:var(--radius);padding:16px;overflow-y:auto;display:flex;flex-direction:column">
+          <div style="font-weight:600;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--card-border)">الخصائص المتقدمة</div>
+          
+          <div id="model-properties" style="display:flex;flex-direction:column;gap:12px;font-size:12px">
+            <div style="text-align:center;color:var(--text-muted);padding:32px 0">
+              لم يتم تحديد نموذج
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPONENT IDENTIFICATION SECTION -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-header">
+        <div class="card-title">🔍 تحديد المكونات (Component Identification)</div>
+        <div style="font-size:11px;color:var(--text-muted)">عرض تفاصيل جميع المكونات المستخرجة من الملف 3D</div>
+      </div>
+      
+      <div id="components-container" style="margin-top:16px">
+        <div style="text-align:center;color:var(--text-muted);padding:32px;font-size:14px">
+          <div style="font-size:32px;margin-bottom:12px">📋</div>
+          ادرج ملف 3DXML أو نموذج 3D لعرض المكونات هنا
+        </div>
+      </div>
+    </div>
+
+    <!-- MODELS LIST & SELECTION -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 النماذج المحفوظة</div>
+      </div>
+      <div style="overflow-x:auto;border-radius:var(--radius);border:1px solid var(--card-border);margin-top:12px">
+        <table style="width:100%;font-size:13px;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--accent)">
+              <th style="padding:12px 16px;text-align:right;font-weight:600;font-size:12px">اسم النموذج</th>
+              <th style="padding:12px 16px;text-align:right;font-weight:600;font-size:12px">النوع</th>
+              <th style="padding:12px 16px;text-align:right;font-weight:600;font-size:12px">المكون</th>
+              <th style="padding:12px 16px;text-align:center;font-weight:600;font-size:12px;width:140px">الإجراء</th>
+            </tr>
+          </thead>
+          <tbody id="models-table-body">
+            <tr><td colspan="4" style="padding:24px;text-align:center;color:var(--text-muted)">لا توجد نماذج محفوظة بعد</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SKETCHFAB MODELS -->
+    <div class="card" style="margin-top:24px">
+      <div class="card-header">
+        <div class="card-title">🎨 نماذج Sketchfab (قابلة للعرض مباشرة)</div>
+      </div>
+      <div id="sketchfab-models-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- VIDEOS PAGE -->
+  <div class="page" id="page-videos">
+    <div class="section-title">فيديوهات طرق التصنيع</div>
+    <div class="section-sub">أضف فيديوهات YouTube أو Vimeo أو ارفع ملفات فيديو لتوثيق عمليات التصنيع</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="filter-row" style="margin:0">
+        <button class="filter-btn active" data-filter="all" onclick="filterVideos('all',this)">الكل</button>
+        <button class="filter-btn" data-filter="Subtractive Processes" onclick="filterVideos('Subtractive Processes',this)">Subtractive Processes</button>
+        <button class="filter-btn" data-filter="Additive Processes" onclick="filterVideos('Additive Processes',this)">Additive Processes</button>
+        <button class="filter-btn" data-filter="Continuous Processes" onclick="filterVideos('Continuous Processes',this)">Continuous Processes</button>
+        <button class="filter-btn" data-filter="Net shape Processes" onclick="filterVideos('Net shape Processes',this)">Net shape Processes</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="checkPasswordAndOpen('add-video-modal')">+ إضافة فيديو</button>
+    </div>
+    <div class="video-grid" id="videos-container"></div>
+  </div>
+
+  <!-- PARTS PAGE -->
+  <div class="page" id="page-parts">
+    <div class="section-title">الأجزاء والمكونات</div>
+    <div class="section-sub">جميع الأجزاء المحللة في مشروع الهندسة العكسية مع موادها وعمليات تصنيعها</div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <div class="search-bar" style="flex:1;margin:0;min-width:200px">
+        <input type="text" id="parts-search" placeholder="ابحث عن جزء..." oninput="filterParts()">
+      </div>
+      <div class="filter-row" style="margin:0">
+        <button class="filter-btn active" data-filter="all" onclick="filterPartsBy('all',this)">الكل</button>
+        <button class="filter-btn" data-filter="thermoplastic" onclick="filterPartsBy('thermoplastic',this)">Thermoplastic</button>
+        <button class="filter-btn" data-filter="steel" onclick="filterPartsBy('steel',this)">Steel</button>
+        <button class="filter-btn" data-filter="copper" onclick="filterPartsBy('copper',this)">Copper</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="checkPasswordAndOpen('add-part-modal')">+ إضافة جزء</button>
+    </div>
+    <div id="parts-view-toggle" style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-outline btn-sm active-view" id="view-table" onclick="setPartsView('table')">جدول</button>
+      <button class="btn btn-outline btn-sm" id="view-cards" onclick="setPartsView('cards')">بطاقات</button>
+    </div>
+    <div id="parts-table-view">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th style="text-align:center;width:60px">صورة</th>
+              <th>اسم المكون</th>
+              <th>الوظيفة</th>
+              <th>المادة</th>
+              <th>طريقة التعريف</th>
+              <th>التصنيع</th>
+              <th style="text-align:center;width:80px">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="parts-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="parts-cards-view" style="display:none">
+      <div class="grid grid-3" id="parts-cards-grid"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD PAGE -->
+  <div class="page" id="page-dashboard">
+    <div class="section-title">لوحة التحكم</div>
+    <div class="section-sub">تحكم في محتوى وشكل الموقع بالكامل من هنا</div>
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🎨 مظهر الموقع</div></div>
+        <div class="control-group">
+          <div class="control-label">اللون الأساسي</div>
+          <div class="color-swatches">
+            <div class="swatch active" style="background:#e94560" onclick="setAccentColor('#e94560',this)"></div>
+            <div class="swatch" style="background:#0ea5e9" onclick="setAccentColor('#0ea5e9',this)"></div>
+            <div class="swatch" style="background:#10b981" onclick="setAccentColor('#10b981',this)"></div>
+            <div class="swatch" style="background:#8b5cf6" onclick="setAccentColor('#8b5cf6',this)"></div>
+            <div class="swatch" style="background:#f59e0b" onclick="setAccentColor('#f59e0b',this)"></div>
+            <div class="swatch" style="background:#ef4444" onclick="setAccentColor('#ef4444',this)"></div>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">الخط</div>
+          <div class="font-options">
+            <div class="font-opt selected" onclick="setFont('Cairo',this)" style="font-family:'Cairo'">Cairo</div>
+            <div class="font-opt" onclick="setFont('Tajawal',this)" style="font-family:'Tajawal'">Tajawal</div>
+            <div class="font-opt" onclick="setFont('Arial',this)">Arial</div>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">إعدادات الصفحات</div>
+          <div class="toggle-row">
+            <span class="toggle-label">إظهار صفحة 3D</span>
+            <label class="toggle"><input type="checkbox" checked id="toggle-3d" onchange="togglePage('model3d',this)"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">إظهار صفحة الفيديوهات</span>
+            <label class="toggle"><input type="checkbox" checked id="toggle-videos" onchange="togglePage('videos',this)"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">إظهار صفحة المكونات</span>
+            <label class="toggle"><input type="checkbox" checked id="toggle-parts" onchange="togglePage('parts',this)"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📝 معلومات المشروع</div></div>
+        <div class="form-group">
+          <label>عنوان المشروع</label>
+          <input type="text" id="site-title" value="MDP181: Production Engineering" oninput="updateSiteInfo()">
+        </div>
+        <div class="form-group">
+          <label>الجامعة / الكلية</label>
+          <input type="text" id="site-uni" value="كلية الهندسة — جامعة عين شمس" oninput="updateSiteInfo()">
+        </div>
+        <div class="form-group">
+          <label>الموسم الدراسي</label>
+          <input type="text" id="site-semester" value="2024/2025">
+        </div>
+        <div class="form-group">
+          <label>وصف المشروع</label>
+          <textarea id="site-desc">مشروع هندسة عكسية لتحليل مكونات أجهزة منزلية وتحديد موادها وعمليات تصنيعها</textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 حفظ التغييرات</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📊 إحصاءات المحتوى</div></div>
+      <div class="grid grid-3">
+        <div style="text-align:center;padding:16px">
+          <div style="font-size:28px;font-weight:700;color:var(--gold);font-family:'Orbitron'" id="dash-parts-count">29</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">مكون محلل</div>
+        </div>
+        <div style="text-align:center;padding:16px">
+          <div style="font-size:28px;font-weight:700;color:var(--gold2);font-family:'Orbitron'" id="dash-videos-count">0</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">فيديو مضاف</div>
+        </div>
+        <div style="text-align:center;padding:16px">
+          <div style="font-size:28px;font-weight:700;color:#4ade80;font-family:'Orbitron'" id="dash-models-count">0</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">نموذج 3D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM PAGE -->
+  <div class="page" id="page-team">
+    <div class="section-title">الفريق</div>
+    <div class="section-sub">فريق مشروع الهندسة العكسية — كلية الهندسة جامعة عين شمس</div>
+    <div class="grid grid-3" id="team-grid"></div>
+    <div style="margin-top:24px;text-align:center">
+      <button class="btn btn-primary" onclick="checkPasswordAndOpen('add-member-modal')">+ إضافة عضو</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="add-video-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-video-modal')">✕</button>
+    <h3>إضافة فيديو جديد</h3>
+    <div class="form-group"><label>عنوان الفيديو</label><input type="text" id="v-title" placeholder="مثال: Injection Molding Process"></div>
+    <div class="form-group"><label>رابط YouTube / Vimeo</label><input type="url" id="v-url" placeholder="https://youtube.com/watch?v=..."></div>
+    <div class="form-group"><label>التصنيف</label>
+      <select id="v-tag">
+        <option value="Subtractive Processes">Subtractive Processes</option>
+        <option value="Additive Processes">Additive Processes</option>
+        <option value="Continuous Processes">Continuous Processes</option>
+        <option value="Net shape Processes">Net shape Processes</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-group"><label>وصف قصير</label><textarea id="v-desc" placeholder="اشرح ما يعرضه الفيديو..."></textarea></div>
+    <button class="btn btn-primary" onclick="addVideo()">إضافة الفيديو</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="add-model-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-model-modal')">✕</button>
+    <h3>إضافة نموذج 3D</h3>
+    <div class="form-group"><label>اسم النموذج</label><input type="text" id="m-name" placeholder="مثال: Heating Coil"></div>
+    <div class="form-group"><label>رابط Sketchfab embed</label><input type="url" id="m-url" placeholder="https://sketchfab.com/models/.../embed"></div>
+    <div class="form-group"><label>المكون المرتبط</label><input type="text" id="m-part" placeholder="مثال: Heating Assembly"></div>
+    <button class="btn btn-primary" onclick="addModel()">إضافة النموذج</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="add-part-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-part-modal')">✕</button>
+    <h3 id="part-modal-title">إضافة مكون جديد</h3>
+    <div class="form-group"><label>اسم المكون</label><input type="text" id="p-name" placeholder="Component Name"></div>
+    <div class="form-group"><label>الوظيفة</label><textarea id="p-func" placeholder="Function..."></textarea></div>
+    <div class="form-group"><label>المادة</label><input type="text" id="p-mat" placeholder="Material..."></div>
+    <div class="form-group"><label>طريقة التعريف</label><input type="text" id="p-method" placeholder="Test method..."></div>
+    <div class="form-group"><label>طريقة التصنيع</label><textarea id="p-mfg" placeholder="Manufacturing process..."></textarea></div>
+    <div class="form-group"><label>صورة المكون</label><input type="file" id="p-image" accept="image/*"></div>
+    <button class="btn btn-primary" id="part-submit-btn" onclick="addPart()">إضافة المكون</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-part-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('edit-part-modal')">✕</button>
+    <h3>تعديل المكون</h3>
+    <div class="form-group"><label>اسم المكون</label><input type="text" id="ep-name" placeholder="Component Name"></div>
+    <div class="form-group"><label>الوظيفة</label><textarea id="ep-func" placeholder="Function..."></textarea></div>
+    <div class="form-group"><label>المادة</label><input type="text" id="ep-mat" placeholder="Material..."></div>
+    <div class="form-group"><label>طريقة التعريف</label><input type="text" id="ep-method" placeholder="Test method..."></div>
+    <div class="form-group"><label>طريقة التصنيع</label><textarea id="ep-mfg" placeholder="Manufacturing process..."></textarea></div>
+    <div class="form-group"><label>صورة المكون</label><input type="file" id="ep-image" accept="image/*"></div>
+    <button class="btn btn-primary" onclick="savePartEdit()">حفظ التعديلات</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="add-member-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-member-modal')">✕</button>
+    <h3>إضافة عضو للفريق</h3>
+    <div class="form-group"><label>الاسم</label><input type="text" id="tm-name" placeholder="الاسم الكامل"></div>
+    <div class="form-group"><label>الدور</label><input type="text" id="tm-role" placeholder="مثال: مسؤول النماذج ثلاثية الأبعاد"></div>
+    <div class="form-group"><label>الرقم الجامعي</label><input type="text" id="tm-id" placeholder="20XXXXXXXX"></div>
+    <button class="btn btn-primary" onclick="addMember()">إضافة العضو</button>
+  </div>
+</div>
+
+<!-- PASSWORD PROTECTION MODAL -->
+<div class="password-modal" id="password-modal">
+  <div class="password-modal-content">
+    <h2>🔐 أدخل كلمة المرور</h2>
+    <input type="password" id="password-input" placeholder="كلمة المرور" onkeypress="if(event.key==='Enter')verifyPassword()">
+    <button class="btn btn-primary" onclick="verifyPassword()">تحقق</button>
+    <button class="btn btn-close-pwd" onclick="closePasswordModal()">إلغاء</button>
+  </div>
+</div>
+
+<div class="notify" id="notify"></div>
+
+<script>
+const PARTS_DATA = [
+  {id:1,name:"Heating Assembly (Coil & MICA Board)",func:"The Coil converts electrical energy into thermal energy. The MICA Board holds the coils and protects the airway.",material:"Nickel-Chrome / Muscovite MICA",method:"Color & Magnet Test / Visual",mfg:"Wire Drawing → Coiling / Lamination → Punching",tags:["nickel-chrome","mica"],image:""},
+  {id:2,name:"Control Button Assembly (Base & Cap)",func:"Metal Base transmits mechanical pressure. Thermoplastic Cap provides insulating user interface.",material:"Low Carbon Steel / Thermoplastic",method:"Magnet & Spark Test / Thermal Test",mfg:"Flat Rolling → Blanking / Injection Molding",tags:["steel","thermoplastic"],image:""},
+  {id:3,name:"Impeller",func:"Air Circulation/Flow",material:"Thermoplastic",method:"Low Density / Non-Magnetic / Melting Test",mfg:"Plasticizing → Injection Molding → Cooling → Ejection",tags:["thermoplastic"],image:""},
+  {id:4,name:"Screw",func:"Temporary Mechanical Joining",material:"Mild Steel",method:"Magnetic Properties / Color",mfg:"Wire Drawing → Cold Heading → Thread Rolling → Coating",tags:["steel"],image:""},
+  {id:5,name:"Carbon Brush (Body)",func:"Transfers electrical current from stationary wires to rotating commutator through sliding contact.",material:"Graphite (Carbon)",method:"Visual / Scratch Test",mfg:"Powder Compaction → Sintering",tags:["carbon"],image:""},
+  {id:6,name:"Compression Spring",func:"Applies constant mechanical pressure to ensure continuous contact as carbon wears down.",material:"Spring Steel",method:"Magnet Test",mfg:"Wire Drawing → Cold Coiling → Heat Treatment",tags:["steel"],image:""},
+  {id:7,name:"Copper Pigtail (Wire)",func:"Provides flexible, high-conductivity path to carry current directly to the brush.",material:"Copper",method:"Visual Inspection",mfg:"Wire Drawing → Stranding",tags:["copper"],image:""},
+  {id:8,name:"Speaker Frame",func:"Holds all components together",material:"Low Carbon Steel",method:"Magnet and Spark Test",mfg:"Casting → Flat Rolling → Blanking → Deep Drawing → Piercing",tags:["steel"],image:""},
+  {id:9,name:"Dust Cap",func:"Protect the voice coil from dust",material:"Aluminum",method:"Non-magnetic, no spark, silver color",mfg:"Casting → Flat Rolling → Blanking → Deep Drawing",tags:["aluminum"],image:""},
+  {id:10,name:"Voice Coil",func:"Carries electrical signals and creates magnetic field that interacts with the magnet",material:"Thermoset (frame) / Copper (wire)",method:"Flame test / Magnet test",mfg:"Injection (frame) → Wire Drawing (coil)",tags:["copper","thermoset"],image:""},
+  {id:11,name:"Planetary Gear Carrier (Plastic Gears)",func:"Act as integrated bearings allowing gears to rotate smoothly",material:"Thermoplastic",method:"Flame test / Touch test",mfg:"Injection Molding",tags:["thermoplastic"],image:""},
+  {id:12,name:"Planetary Gear Carrier (Metal)",func:"Provides structural rigidity and prevents frame from warping.",material:"Low Carbon Steel",method:"Magnet and Spark Test",mfg:"Casting → Flat Rolling → Blanking → Piercing",tags:["steel"],image:""},
+  {id:13,name:"Brush Holder Base & Lower Housing",func:"Holds the carbon brushes. Central black post is bearing seat/shaft support.",material:"Thermoplastic",method:"Burn Test",mfg:"Raw Material Drying → Injection Molding → Cooling & Ejection",tags:["thermoplastic"],image:""},
+  {id:14,name:"Handles",func:"Upper/outer grip cover. Provides ergonomic shape, structural support and houses internal wiring/switches",material:"Thermoplastic",method:"Burn test / Visual test",mfg:"Raw Material Drying → Injection Molding → Cooling & Ejection",tags:["thermoplastic"],image:""},
+  {id:15,name:"Keystone Coil Spring",func:"Terminal coil spring contact for batteries. Provides constant spring pressure for good electrical contact.",material:"Stainless Steel",method:"Magnet test / Spark test",mfg:"Progressive Die Stamping → Spring Coiling → Attachment Crimping",tags:["steel"],image:""},
+  {id:16,name:"Mesh Grill",func:"Prevents damage to internal pieces and allows sound waves to pass through clearly.",material:"Low Carbon Steel",method:"Magnet & Spark Test",mfg:"Rolling → Punching → Bending → Coating",tags:["steel"],image:""},
+  {id:17,name:"Blower Impeller",func:"Draws air from surroundings, accelerates it, and forces it across the heating element.",material:"Thermoplastic",method:"Thermal (Melting Test)",mfg:"Injection Molding",tags:["thermoplastic"],image:""},
+  {id:18,name:"Tape Head (Core & Gap & Case & Coils)",func:"Responsible for faithful reproduction and recording of analog signals while maintaining mechanical alignment.",material:"Nickel-Iron Alloy / Copper / Brass / Stainless Steel",method:"Density & Magnet / Conductivity / Color Test",mfg:"Rolling → Blanking → Annealing / Wire Drawing → Enameling → Winding / Deep Drawing",tags:["nickel","copper","steel"],image:""},
+  {id:19,name:"Insulated Wire",func:"Carries electric current safely from power source. Insulation isolates conductor electrically.",material:"Copper / PVC (Thermoplastic)",method:"Magnetic test / Conductivity / Visual test",mfg:"Metal Extrusion → Wire Drawing → Annealing → Stranding → Plastic Extrusion",tags:["copper","thermoplastic"],image:""},
+  {id:20,name:"Motor Housing",func:"Outer cover of motor. Protects internal parts, keeps them aligned and provides mounting structure.",material:"Low Carbon Steel",method:"Magnetic test / Spark test",mfg:"Flat Rolling → Blanking → Deep Drawing → Bending → Piercing → Stamping → Lancing",tags:["steel"],image:""},
+  {id:21,name:"Plug (Body & Pins)",func:"Electric connection, Insulation & safety, Strain relief",material:"Thermoset (body) / Nickel-Plated Brass (pins)",method:"Melting test / Magnet test / Scratch test",mfg:"Injection Molding (body) / Extrusion (pins)",tags:["thermoset","brass"],image:""},
+  {id:22,name:"Main Chassis",func:"Structural Support, Component Mounting, Mechanical Guidance, Electrical Grounding.",material:"Low Carbon Steel",method:"Spark Test / Magnet",mfg:"Rolling → Blanking & Piercing (Progressive Die Stamping) → Bending",tags:["steel"],image:""},
+  {id:23,name:"Antenna Support Base",func:"Pivot point allowing antenna to rotate. Transfers signal from antenna to radio PCB.",material:"Chrome-Plated Brass",method:"Magnetic / Visual / Colour Scratch / Spark Test",mfg:"Turning → Drilling & Tapping → Milling / Slotting → Electroplating",tags:["brass"],image:""},
+  {id:24,name:"Connecting Wire (Insulated Copper)",func:"Acts as electrical conductor transmitting captured radio signal from antenna to main PCB.",material:"Copper (Core) / PVC (Insulation)",method:"Magnetic / Visual / Stripping / Bending Test",mfg:"Wire Drawing → Extrusion → Soldering",tags:["copper","thermoplastic"],image:""},
+  {id:25,name:"Electrical Transformer (Core & Coils)",func:"Transfers electrical energy through electromagnetic induction, adjusts voltage, matches impedance.",material:"Silicon Steel (core) / Copper (coils)",method:"Magnet Test / Ductility test",mfg:"Cold Rolling → Shearing → Blanking → Drilling / Wire Drawing",tags:["steel","copper"],image:""},
+  {id:26,name:"Filter Cap",func:"Traps lint and hair before they reach motor or heating coils. Improves airflow, prevents overheating.",material:"Thermoplastic",method:"Thermal (Melting Test)",mfg:"Injection Molding → Blanking and Piercing",tags:["thermoplastic"],image:""},
+  {id:27,name:"Rocker Switch",func:"Functions as a power flow controller (ON/OFF) for a specific part of the system.",material:"Thermoset Plastic / Copper",method:"—",mfg:"Injection Molding → Piercing",tags:["thermoset","copper"],image:""},
+  {id:28,name:"Airflow Directing (Nozzle)",func:"External design focuses hot air onto the hair. Reduces pollution by providing clean air.",material:"Low Carbon Steel with Nickel Chrome",method:"Spark Test",mfg:"Deep Drawing → Piercing → Coating Nickel Chrome",tags:["steel","nickel-chrome"],image:""},
+  {id:29,name:"Electrical Transformer (Core & Windings)",func:"Core provides efficient magnetic path. Coils transfer electrical energy through induction.",material:"Silicon Steel / Copper",method:"Magnet Test / Ductility",mfg:"Cold Rolling → Shearing → Blanking / Wire Drawing",tags:["steel","copper"],image:""},
+];
+
+let videosData = [];
+let modelsData = [];
+let teamData = [];
+let currentFilter = 'all';
+let currentPartsFilter = 'all';
+let partsView = 'table';
+let isPasswordVerified = false;
+let pendingModalId = null;
+let editingPartId = null;
+const PASSWORD = '240001727';
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+  const pageEl = document.getElementById('page-'+id);
+  if(pageEl){
+    pageEl.classList.add('active');
+    pageEl.style.display = '';
+  }
+  document.getElementById('nav-'+id)?.classList.add('active');
+  const titles = {home:'الرئيسية','model3d':'النموذج ثلاثي الأبعاد',videos:'فيديوهات التصنيع',parts:'الأجزاء والمكونات',dashboard:'لوحة التحكم',team:'الفريق'};
+  document.getElementById('page-title').textContent = titles[id]||id;
+  saveState();
+}
+
+function notify(msg){
+  const el = document.getElementById('notify');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+
+function saveState(){
+  try{
+    localStorage.setItem('reverse_engineering_videos', JSON.stringify(videosData));
+    localStorage.setItem('reverse_engineering_models', JSON.stringify(modelsData));
+    localStorage.setItem('reverse_engineering_team', JSON.stringify(teamData));
+    localStorage.setItem('reverse_engineering_parts', JSON.stringify(PARTS_DATA));
+    localStorage.setItem('reverse_engineering_settings', JSON.stringify({
+      title: document.getElementById('site-title')?.value,
+      uni: document.getElementById('site-uni')?.value,
+      desc: document.getElementById('site-desc')?.value,
+      semester: document.getElementById('site-semester')?.value,
+      accent: getComputedStyle(document.documentElement).getPropertyValue('--gold').trim(),
+      font: getComputedStyle(document.body).fontFamily,
+      currentFilter,
+      currentPartsFilter,
+      partsView,
+      activePage: document.querySelector('.nav a.active')?.id?.replace('nav-','') || 'home'
+    }));
+    const hiddenPages = ['model3d','videos','parts'].filter(id=>{
+      const checkbox=document.getElementById('toggle-'+id);
+      return checkbox && !checkbox.checked;
+    });
+    localStorage.setItem('reverse_engineering_hiddenPages', JSON.stringify(hiddenPages));
+  } catch (error){
+    console.warn('Unable to save state', error);
+  }
+}
+
+function loadState(){
+  try{
+    const videos = localStorage.getItem('reverse_engineering_videos');
+    if(videos) videosData = JSON.parse(videos);
+    const models = localStorage.getItem('reverse_engineering_models');
+    if(models) modelsData = JSON.parse(models);
+    const team = localStorage.getItem('reverse_engineering_team');
+    if(team) teamData = JSON.parse(team);
+    const parts = localStorage.getItem('reverse_engineering_parts');
+    if(parts){
+      const loaded = JSON.parse(parts);
+      PARTS_DATA.length = 0;
+      PARTS_DATA.push(...loaded);
+    }
+    const settings = localStorage.getItem('reverse_engineering_settings');
+    if(settings){
+      const saved = JSON.parse(settings);
+      if(saved.title) document.getElementById('site-title').value = saved.title;
+      if(saved.uni) document.getElementById('site-uni').value = saved.uni;
+      if(saved.desc) document.getElementById('site-desc').value = saved.desc;
+      if(saved.semester) document.getElementById('site-semester').value = saved.semester;
+      if(saved.accent) document.documentElement.style.setProperty('--gold', saved.accent);
+      if(saved.font) document.body.style.fontFamily = saved.font;
+      if(saved.currentFilter) currentFilter = saved.currentFilter;
+      if(saved.currentPartsFilter) currentPartsFilter = saved.currentPartsFilter;
+      if(saved.partsView) partsView = saved.partsView;
+      document.querySelector('.logo h1').textContent = saved.title || 'MDP181';
+      document.querySelector('.logo p').textContent = saved.uni || 'Ain Shams University — Faculty of Engineering';
+      document.querySelector('.section-sub').textContent = saved.desc || 'مشروع هندسة عكسية لتحليل مكونات أجهزة منزلية وتحديد موادها وعمليات تصنيعها';
+      const fontName = saved.font ? saved.font.split(',')[0].replace(/['"]/g,'').trim() : '';
+      document.querySelectorAll('.font-opt').forEach(o=>o.classList.toggle('selected', o.textContent.trim()===fontName));
+      document.querySelectorAll('.swatch').forEach(s=>{
+        const style = s.getAttribute('style')||'';
+        s.classList.toggle('active', saved.accent && style.includes(saved.accent));
+      });
+      if(saved.currentFilter){
+        document.querySelectorAll('#page-videos .filter-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.filter===saved.currentFilter));
+      }
+      if(saved.currentPartsFilter){
+        document.querySelectorAll('#page-parts .filter-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.filter===saved.currentPartsFilter));
+      }
+      if(saved.partsView){
+        setPartsView(saved.partsView);
+      }
+    }
+    const hiddenPages = localStorage.getItem('reverse_engineering_hiddenPages');
+    if(hiddenPages){
+      const hidden = JSON.parse(hiddenPages);
+      hidden.forEach(id=>{
+        const checkbox=document.getElementById('toggle-'+id);
+        const navEl=document.getElementById('nav-'+id);
+        const pageEl=document.getElementById('page-'+id);
+        if(checkbox) checkbox.checked=false;
+        if(navEl) navEl.style.display='none';
+        if(pageEl) pageEl.style.display='none';
+      });
+    }
+    if(settings){
+      const saved = JSON.parse(settings);
+      if(saved.activePage){
+        const pageNav=document.getElementById('nav-'+saved.activePage);
+        const pageEl=document.getElementById('page-'+saved.activePage);
+        if(pageNav && pageNav.style.display !== 'none') showPage(saved.activePage);
+      }
+    }
+  } catch(error){
+    console.warn('Unable to load state', error);
+  }
+}
+
+// --- PARTS ---
+function renderParts(){
+  const q = (document.getElementById('parts-search')?.value||'').toLowerCase();
+  let filtered = PARTS_DATA.filter(p=>{
+    const matchQ = !q || p.name.toLowerCase().includes(q) || p.material.toLowerCase().includes(q) || p.func.toLowerCase().includes(q);
+    const matchF = currentPartsFilter==='all' || p.tags.some(t=>t.includes(currentPartsFilter));
+    return matchQ && matchF;
+  });
+  
+  const tbody = document.getElementById('parts-tbody');
+  if(tbody){
+    tbody.innerHTML = filtered.map(p=>`
+      <tr>
+        <td style="font-family:'Orbitron';font-size:11px;color:var(--gold);text-align:center">${String(p.id).padStart(2,'0')}</td>
+        <td style="text-align:center">${p.image?`<img src="${p.image}" style="width:48px;height:48px;border-radius:6px;object-fit:cover;cursor:pointer" data-idx="${p.id}">`:`<div style="width:48px;height:48px;background:var(--card-border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px">📷</div>`}</td>
+        <td style="font-weight:600;color:var(--text);min-width:160px">${p.name}</td>
+        <td style="max-width:220px;line-height:1.6">${p.func}</td>
+        <td><span class="tag tag-material">${p.material}</span></td>
+        <td style="max-width:140px">${p.method}</td>
+        <td style="max-width:180px">${p.mfg}</td>
+        <td style="text-align:center;white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="checkPasswordAndEdit(${p.id})" style="padding:4px 8px;font-size:11px">✏️</button><button class="btn btn-outline btn-sm" onclick="checkPasswordAndDelete(${p.id})" style="padding:4px 8px;font-size:11px;margin-right:4px">🗑</button></td>
+      </tr>
+    `).join('');
+  }
+
+  const grid = document.getElementById('parts-cards-grid');
+  if(grid){
+    grid.innerHTML = filtered.map(p=>`
+      <div class="part-card" style="display:flex;flex-direction:column;position:relative">
+        <div style="width:100%;height:160px;background:var(--accent);border-radius:8px;overflow:hidden;margin-bottom:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative" data-idx="${p.id}">
+          ${p.image?`<img src="${p.image}" style="width:100%;height:100%;object-fit:cover">`: `<div style="font-size:48px">📷</div>`}
+          <div style="position:absolute;top:4px;right:4px;display:flex;gap:4px">
+            <button class="btn btn-outline btn-sm" onclick="checkPasswordAndEdit(${p.id})" style="padding:4px 8px;font-size:10px;background:rgba(0,0,0,0.6);border:none">✏️</button>
+            <button class="btn btn-outline btn-sm" onclick="checkPasswordAndDelete(${p.id})" style="padding:4px 8px;font-size:10px;background:rgba(0,0,0,0.6);border:none">🗑</button>
+          </div>
+        </div>
+        <div class="part-num">#${String(p.id).padStart(2,'0')}</div>
+        <div class="part-name">${p.name}</div>
+        <div class="part-meta" style="margin-bottom:8px">${p.func}</div>
+        <div style="margin-top:auto">
+          <span class="tag tag-material">${p.material.split('/')[0].trim()}</span>
+          ${p.mfg.split('→')[0]?`<span class="tag tag-process">${p.mfg.split('→')[0].trim()}</span>`:''}
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function viewImage(imgSrc, title){
+  if(!imgSrc) return;
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:300;cursor:pointer';
+  modal.innerHTML = `
+    <div style="position:relative;max-width:90%;max-height:90%;display:flex;flex-direction:column">
+      <div style="color:var(--text);margin-bottom:12px;text-align:center;font-weight:600">${title}</div>
+      <img src="${imgSrc}" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:8px">
+      <button style="position:absolute;top:8px;right:8px;background:var(--gold);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:20px;font-weight:700" onclick="this.closest('div').parentElement.remove()">×</button>
+    </div>
+  `;
+  modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+function attachImageClickListeners(){
+  document.querySelectorAll('[data-idx]').forEach(el => {
+    if(!el.hasListener){
+      el.onclick = (e) => {
+        const idx = parseInt(el.getAttribute('data-idx')) - 1;
+        const part = PARTS_DATA[idx];
+        if(part && part.image) viewImage(part.image, part.name);
+      };
+      el.hasListener = true;
+    }
+  });
+}
+
+function filterParts(){renderParts()}
+function filterPartsBy(f,btn){
+  currentPartsFilter=f.toLowerCase();
+  document.querySelectorAll('.filter-btn').forEach(b=>{if(b.closest('#page-parts'))b.classList.remove('active')});
+  btn.classList.add('active');
+  renderParts();
+  saveState();
+}
+function setPartsView(v){
+  partsView=v;
+  document.getElementById('parts-table-view').style.display = v==='table'?'block':'none';
+  document.getElementById('parts-cards-view').style.display = v==='cards'?'block':'none';
+  document.getElementById('view-table').classList.toggle('btn-primary',v==='table');
+  document.getElementById('view-cards').classList.toggle('btn-primary',v==='cards');
+  document.getElementById('view-table').classList.toggle('btn-outline',v!=='table');
+  document.getElementById('view-cards').classList.toggle('btn-outline',v!=='cards');
+  saveState();
+}
+
+function checkPasswordAndOpen(modalId){
+  if(isPasswordVerified){
+    openModal(modalId);
+  } else {
+    pendingModalId = modalId;
+    document.getElementById('password-modal').classList.add('show');
+    document.getElementById('password-input').focus();
+  }
+}
+
+function checkPasswordAndEdit(partId){
+  if(isPasswordVerified){
+    openEditModal(partId);
+  } else {
+    editingPartId = partId;
+    pendingModalId = 'edit-part-modal';
+    document.getElementById('password-modal').classList.add('show');
+    document.getElementById('password-input').focus();
+  }
+}
+
+function checkPasswordAndDelete(partId){
+  if(isPasswordVerified){
+    deletePart(partId);
+  } else {
+    if(confirm('هل تريد حذف هذا المكون؟')){
+      pendingModalId = null;
+      editingPartId = partId;
+      document.getElementById('password-modal').classList.add('show');
+      document.getElementById('password-input').focus();
+    }
+  }
+}
+
+function verifyPassword(){
+  const password = document.getElementById('password-input').value;
+  if(password === PASSWORD){
+    isPasswordVerified = true;
+    closePasswordModal();
+    if(editingPartId !== null){
+      if(pendingModalId === 'edit-part-modal'){
+        openEditModal(editingPartId);
+      } else {
+        deletePart(editingPartId);
+      }
+      editingPartId = null;
+    } else if(pendingModalId){
+      openModal(pendingModalId);
+    }
+    notify('✅ تم التحقق من كلمة المرور');
+    setTimeout(()=>{ isPasswordVerified = false; }, 600000); // 10 minutes
+  } else {
+    notify('❌ كلمة المرور غير صحيحة');
+    document.getElementById('password-input').value = '';
+  }
+}
+
+function closePasswordModal(){
+  document.getElementById('password-modal').classList.remove('show');
+  document.getElementById('password-input').value = '';
+}
+
+function openEditModal(partId){
+  const part = PARTS_DATA.find(p => p.id === partId);
+  if(!part) return;
+  editingPartId = partId;
+  document.getElementById('ep-name').value = part.name;
+  document.getElementById('ep-func').value = part.func;
+  document.getElementById('ep-mat').value = part.material;
+  document.getElementById('ep-method').value = part.method;
+  document.getElementById('ep-mfg').value = part.mfg;
+  openModal('edit-part-modal');
+}
+
+function savePartEdit(){
+  const part = PARTS_DATA.find(p => p.id === editingPartId);
+  if(!part) return;
+  
+  const imageInput = document.getElementById('ep-image');
+  if(imageInput.files.length > 0){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      part.name = document.getElementById('ep-name').value.trim();
+      part.func = document.getElementById('ep-func').value.trim();
+      part.material = document.getElementById('ep-mat').value.trim();
+      part.method = document.getElementById('ep-method').value.trim();
+      part.mfg = document.getElementById('ep-mfg').value.trim();
+      part.image = e.target.result;
+      renderParts();
+      saveState();
+      closeModal('edit-part-modal');
+      notify('✅ تم حفظ التعديلات');
+      editingPartId = null;
+    };
+    reader.readAsDataURL(imageInput.files[0]);
+  } else {
+    part.name = document.getElementById('ep-name').value.trim();
+    part.func = document.getElementById('ep-func').value.trim();
+    part.material = document.getElementById('ep-mat').value.trim();
+    part.method = document.getElementById('ep-method').value.trim();
+    part.mfg = document.getElementById('ep-mfg').value.trim();
+    renderParts();
+    saveState();
+    closeModal('edit-part-modal');
+    notify('✅ تم حفظ التعديلات');
+    editingPartId = null;
+  }
+}
+
+function deletePart(partId){
+  const index = PARTS_DATA.findIndex(p => p.id === partId);
+  if(index !== -1){
+    PARTS_DATA.splice(index, 1);
+    renderParts();
+    updateStats();
+    saveState();
+    notify('🗑 تم حذف المكون');
+  }
+  editingPartId = null;
+}
+
+function addPart(){
+  const name=document.getElementById('p-name').value.trim();
+  if(!name){notify('أدخل اسم المكون');return}
+  const imageInput=document.getElementById('p-image');
+  let imageData='';
+  if(imageInput.files.length>0){
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+      imageData=e.target.result;
+      PARTS_DATA.push({
+        id:PARTS_DATA.length+1,
+        name,func:document.getElementById('p-func').value,
+        material:document.getElementById('p-mat').value,
+        method:document.getElementById('p-method').value,
+        mfg:document.getElementById('p-mfg').value,
+        tags:[document.getElementById('p-mat').value.toLowerCase().replace(/\s/g,'')],
+        image:imageData
+      });
+      renderParts();
+      updateStats();
+      saveState();
+      closeModal('add-part-modal');
+      notify('✅ تم إضافة المكون');
+      ['p-name','p-func','p-mat','p-method','p-mfg'].forEach(id=>document.getElementById(id).value='');
+      imageInput.value='';
+    };
+    reader.readAsDataURL(imageInput.files[0]);
+  } else {
+    PARTS_DATA.push({
+      id:PARTS_DATA.length+1,
+      name,func:document.getElementById('p-func').value,
+      material:document.getElementById('p-mat').value,
+      method:document.getElementById('p-method').value,
+      mfg:document.getElementById('p-mfg').value,
+      tags:[document.getElementById('p-mat').value.toLowerCase().replace(/\s/g,'')],
+      image:''
+    });
+    renderParts();
+    updateStats();
+    saveState();
+    closeModal('add-part-modal');
+    notify('✅ تم إضافة المكون');
+    ['p-name','p-func','p-mat','p-method','p-mfg'].forEach(id=>document.getElementById(id).value='');
+  }
+}
+
+// --- VIDEOS ---
+function getVideoEmbed(url){
+  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]+)/);
+  if(ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1&showinfo=0`;
+  const ytQueryMatch = url.match(/[?&]v=([\w-]+)/);
+  if(ytQueryMatch) return `https://www.youtube.com/embed/${ytQueryMatch[1]}?rel=0&modestbranding=1&showinfo=0`;
+  const vimeoMatch = url.match(/(?:vimeo\.com\/(?:video\/)?)(\d+)/);
+  if(vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  if(url.includes('player.vimeo.com/video/')) return url;
+  return url;
+}
+
+function renderVideos(){
+  const container = document.getElementById('videos-container');
+  const filtered = videosData.reduce((acc,v,i)=>{
+    if(currentFilter==='all' || v.tag===currentFilter) acc.push({ ...v, __idx:i });
+    return acc;
+  }, []);
+  if(!filtered.length){
+    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text-muted)">
+      <div style="font-size:32px;margin-bottom:8px">🎬</div>
+      <div>لا توجد فيديوهات بعد. اضغط "+ إضافة فيديو" للبداية.</div>
+    </div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(v=>`
+    <div class="video-card">
+      <div class="video-thumb">
+        <iframe src="${v.embed}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" allowfullscreen loading="lazy" referrerpolicy="origin"></iframe>
+      </div>
+      <div class="video-info">
+        <h4>${v.title}</h4>
+        <p>${v.desc||''}</p>
+      </div>
+      <div class="video-actions">
+        <span class="tag tag-process">${v.tag}</span>
+        <button class="btn btn-outline btn-sm" style="margin-right:auto" onclick="removeVideo(${v.__idx})">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addVideo(){
+  const title=document.getElementById('v-title').value.trim();
+  const url=document.getElementById('v-url').value.trim();
+  if(!title||!url){notify('أدخل العنوان والرابط');return}
+  videosData.push({title,url,embed:getVideoEmbed(url),tag:document.getElementById('v-tag').value,desc:document.getElementById('v-desc').value});
+  renderVideos();
+  updateStats();
+  saveState();
+  closeModal('add-video-modal');
+  notify('✅ تم إضافة الفيديو');
+  ['v-title','v-url','v-desc'].forEach(id=>document.getElementById(id).value='');
+}
+
+function removeVideo(i){videosData.splice(i,1);renderVideos();updateStats();saveState();notify('🗑 تم حذف الفيديو')}
+
+function filterVideos(tag,btn){
+  currentFilter=tag;
+  document.querySelectorAll('#page-videos .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderVideos();
+  saveState();
+}
+
+// --- 3D MODELS ---
+function addModelQuick(){
+  const name = document.getElementById('m-name-quick').value.trim();
+  const url = document.getElementById('m-url-quick').value.trim();
+  if(!name || !url){notify('أدخل الاسم والرابط');return}
+  modelsData.push({name, url, part: document.getElementById('m-part-quick').value});
+  renderModelsTable();
+  renderSketchfabModels();
+  updateStats();
+  saveState();
+  notify('✅ تم حفظ النموذج');
+  document.getElementById('m-name-quick').value='';
+  document.getElementById('m-url-quick').value='';
+  document.getElementById('m-part-quick').value='';
+}
+
+function renderSketchfabModels(){
+  const container = document.getElementById('sketchfab-models-container');
+  const sketchfabModels = modelsData.filter(m=>m.url.includes('sketchfab.com'));
+  
+  if(sketchfabModels.length===0){
+    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted)">لا توجد نماذج Sketchfab محفوظة. أضف رابط Sketchfab لعرضه مباشرة.</div>';
+    return;
+  }
+  
+  container.innerHTML = sketchfabModels.map((m,i)=>{
+    const embedUrl = m.url.includes('/embed') ? m.url : `https://sketchfab.com/models/${m.url.split('/models/')[1]?.split('/')[0]}/embed`;
+    const modelIdx = modelsData.indexOf(m);
+    return `
+      <div style="border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column">
+        <iframe src="${embedUrl}" style="width:100%;height:250px;border:none" allow="autoplay" loading="lazy"></iframe>
+        <div style="padding:12px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">${m.name}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">${m.part||'—'}</div>
+          <button class="btn btn-outline btn-sm" style="width:100%" onclick="removeModel(${modelIdx})">🗑 حذف</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderModelsTable(){
+  const tbody = document.getElementById('models-table-body');
+  if(modelsData.length===0){
+    tbody.innerHTML = '<tr><td colspan="4" style="padding:24px;text-align:center;color:var(--text-muted)">لا توجد نماذج محفوظة بعد</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = modelsData.map((m,i)=>{
+    const isSketchfab = m.url.includes('sketchfab.com');
+    const isOnshape = m.url.includes('onshape.com') || m.url.includes('cad.onshape.com');
+    const isFile = m.isFile || m.url.startsWith('data:');
+    let type = 'ملف محلي';
+    if(isSketchfab) type = '🎨 Sketchfab';
+    else if(isOnshape) type = '⚙️ Onshape';
+    else if(m.url.startsWith('http')) type = '🔗 رابط خارجي';
+    else if(isFile) type = `📦 ${(m.type || 'FILE').toUpperCase()}`;
+    
+    return `
+      <tr>
+        <td style="padding:11px 16px;border-bottom:1px solid var(--card-border);color:var(--text);font-weight:600">${m.name}</td>
+        <td style="padding:11px 16px;border-bottom:1px solid var(--card-border);color:var(--text-muted);font-size:12px">${type}</td>
+        <td style="padding:11px 16px;border-bottom:1px solid var(--card-border);color:var(--text-muted);font-size:12px">${m.part||'—'}</td>
+        <td style="padding:11px 16px;border-bottom:1px solid var(--card-border);text-align:center;white-space:nowrap">
+          ${isFile && m.fileData ? `<button class="btn btn-outline btn-sm" onclick="loadModelToPivot(${i})" style="padding:4px 8px;font-size:11px">🎯 عرض</button>` : ''}
+          ${isFile && m.fileData ? `<button class="btn btn-outline btn-sm" onclick="view3DModel('${i}')" style="padding:4px 8px;font-size:11px;margin-right:4px">👁️ ملء الشاشة</button>` : (m.url.startsWith('http') && !isSketchfab ? `<button class="btn btn-outline btn-sm" onclick="window.open('${m.url}','_blank')" style="padding:4px 8px;font-size:11px">فتح</button>` : '')}
+          <button class="btn btn-outline btn-sm" onclick="removeModel(${i})" style="margin-right:4px;padding:4px 8px;font-size:11px">🗑</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function removeModel(i){
+  modelsData.splice(i,1);
+  renderModelsTable();
+  renderSketchfabModels();
+  updateStats();
+  saveState();
+  notify('🗑 تم حذف النموذج');
+}
+
+function loadModelToPivot(modelIndex){
+  const model = modelsData[modelIndex];
+  if(!model || !model.fileData) return;
+  
+  const container = document.getElementById('3d-pivot-viewer');
+  const propertiesPanel = document.getElementById('model-properties');
+  
+  // Clear previous content
+  container.innerHTML = '';
+  
+  // Initialize Three.js for pivot viewer
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x1a1a2e);
+  
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 100;
+  
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.shadowMap.enabled = true;
+  container.appendChild(renderer.domElement);
+  
+  // Add lights
+  const light1 = new THREE.DirectionalLight(0xffffff, 0.9);
+  light1.position.set(150, 150, 150);
+  light1.castShadow = true;
+  scene.add(light1);
+  
+  const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+  light2.position.set(-150, -150, -150);
+  scene.add(light2);
+  
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+  
+  // Load and parse STL
+  const geom = new THREE.BufferGeometry();
+  let mesh, modelSize;
+  
+  try {
+    const arrayBuffer = dataURItoArrayBuffer(model.fileData);
+    const isASCII = isASCIISTL(arrayBuffer);
+    
+    if(isASCII){
+      parseASCIISTL(arrayBuffer, geom);
+    } else {
+      parseBinarySTL(arrayBuffer, geom);
+    }
+    
+    const material = new THREE.MeshPhongMaterial({ 
+      color: 0xe94560, 
+      emissive: 0x1a1a2e,
+      shininess: 100,
+      side: THREE.DoubleSide
+    });
+    mesh = new THREE.Mesh(geom, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+    
+    // Compute bounding box and center
+    geom.computeBoundingBox();
+    const bbox = geom.boundingBox;
+    const center = new THREE.Vector3();
+    bbox.getCenter(center);
+    geom.translate(-center.x, -center.y, -center.z);
+    
+    const size = bbox.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 40 / maxDim;
+    mesh.scale.multiplyScalar(scale);
+    
+    modelSize = { x: size.x, y: size.y, z: size.z, maxDim: maxDim };
+    camera.position.z = maxDim * 1.2;
+    
+    // Update properties panel
+    const properties = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--card-bg);padding:8px;border-radius:6px">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">الملف</div>
+          <div style="font-size:11px;word-break:break-all">${model.name}</div>
+        </div>
+        <div style="background:var(--card-bg);padding:8px;border-radius:6px">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">النوع</div>
+          <div style="font-size:11px">${model.type?.toUpperCase() || 'STL'}</div>
+        </div>
+        <div style="background:var(--card-bg);padding:8px;border-radius:6px">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">المكون</div>
+          <div style="font-size:11px">${model.part || '—'}</div>
+        </div>
+        <div style="background:var(--card-bg);padding:8px;border-radius:6px">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">الحجم</div>
+          <div style="font-size:11px">${(model.fileData.length / 1024).toFixed(1)} KB</div>
+        </div>
+      </div>
+      
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--card-border)">
+        <div style="font-size:11px;font-weight:600;margin-bottom:8px">الأبعاد (Dimensions)</div>
+        <div style="background:var(--card-bg);padding:8px;border-radius:6px;font-size:11px;line-height:1.6">
+          <div>📏 X: ${modelSize.x.toFixed(2)}</div>
+          <div>📏 Y: ${modelSize.y.toFixed(2)}</div>
+          <div>📏 Z: ${modelSize.z.toFixed(2)}</div>
+          <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border)">
+            📊 الأكبر: ${modelSize.maxDim.toFixed(2)}
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top:12px;padding:8px;background:var(--card-bg);border-radius:6px;font-size:10px;color:var(--text-muted);line-height:1.5">
+        <div style="margin-bottom:4px">التحكم:</div>
+        <div>🖱️ اسحب للدوران</div>
+        <div>🖱️ عجلة لتكبير/تصغير</div>
+      </div>
+    `;
+    propertiesPanel.innerHTML = properties;
+    
+  } catch(e){
+    console.error('Error loading model:', e);
+    container.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:48px">خطأ في تحميل النموذج</div>';
+    return;
+  }
+  
+  // Interactive controls
+  let isDragging = false;
+  let previousMousePosition = { x: 0, y: 0 };
+  let rotation = { x: 0, y: 0 };
+  
+  renderer.domElement.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+  
+  renderer.domElement.addEventListener('mousemove', (e) => {
+    if(isDragging && mesh) {
+      const deltaX = e.clientX - previousMousePosition.x;
+      const deltaY = e.clientY - previousMousePosition.y;
+      
+      rotation.y += deltaX * 0.005;
+      rotation.x += deltaY * 0.005;
+      
+      mesh.rotation.order = 'YXZ';
+      mesh.rotation.x = rotation.x;
+      mesh.rotation.y = rotation.y;
+      
+      previousMousePosition = { x: e.clientX, y: e.clientY };
+    }
+  });
+  
+  renderer.domElement.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+  
+  renderer.domElement.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    camera.position.z += e.deltaY * 0.3;
+  }, false);
+  
+  // Animation loop
+  const animate = () => {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  };
+  animate();
+  
+  // Handle resize
+  const handleResize = () => {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  };
+  
+  window.addEventListener('resize', handleResize);
+  
+  // Display component identification if available
+  if(model.components && model.components.length > 0){
+    displayComponentsIdentification(model.components, model.name);
+  }
+  
+  notify('✅ تم تحميل النموذج في محرر Pivot');
+}
+
+function view3DModel(modelIndex){
+  const model = modelsData[modelIndex];
+  if(!model || !model.fileData) return;
+  
+  // Create modal container for 3D viewer
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:300;flex-direction:column';
+  
+  const header = document.createElement('div');
+  header.style.cssText = 'position:absolute;top:0;left:0;right:0;padding:16px;background:rgba(0,0,0,0.7);display:flex;justify-content:space-between;align-items:center;z-index:301;color:var(--text)';
+  header.innerHTML = `<div style="font-weight:600">${model.name}</div><button style="background:var(--gold);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:20px;font-weight:700" onclick="this.closest('div').parentElement.remove()">×</button>`;
+  
+  const container = document.createElement('div');
+  container.style.cssText = 'width:100%;height:100%;background:#1a1a2e';
+  
+  modal.appendChild(header);
+  modal.appendChild(container);
+  document.body.appendChild(modal);
+  
+  // Initialize Three.js
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x1a1a2e);
+  
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 100;
+  
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
+  
+  // Add lights
+  const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+  light1.position.set(100, 100, 100);
+  scene.add(light1);
+  
+  const light2 = new THREE.DirectionalLight(0xffffff, 0.4);
+  light2.position.set(-100, -100, -100);
+  scene.add(light2);
+  
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+  
+  // Load STL file
+  const geom = new THREE.BufferGeometry();
+  try {
+    // Parse binary STL data
+    const arrayBuffer = dataURItoArrayBuffer(model.fileData);
+    const view = new DataView(arrayBuffer);
+    const isASCII = isASCIISTL(arrayBuffer);
+    
+    if(isASCII){
+      parseASCIISTL(arrayBuffer, geom);
+    } else {
+      parseBinarySTL(arrayBuffer, geom);
+    }
+    
+    const material = new THREE.MeshPhongMaterial({ color: 0xe94560, emissive: 0x000000, shininess: 30 });
+    const mesh = new THREE.Mesh(geom, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+    
+    // Center and scale mesh
+    geom.computeBoundingBox();
+    const bbox = geom.boundingBox;
+    const center = new THREE.Vector3();
+    bbox.getCenter(center);
+    geom.translate(-center.x, -center.y, -center.z);
+    
+    const size = bbox.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 50 / maxDim;
+    mesh.scale.multiplyScalar(scale);
+    
+    camera.position.z = maxDim * 1.5;
+  } catch(e){
+    console.error('Error loading 3D model:', e);
+    container.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:48px">Error loading 3D model. Format may not be supported.</div>';
+    return;
+  }
+  
+  // Add orbit controls
+  let isDragging = false;
+  let previousMousePosition = { x: 0, y: 0 };
+  
+  renderer.domElement.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+  
+  renderer.domElement.addEventListener('mousemove', (e) => {
+    if(isDragging) {
+      const deltaX = e.clientX - previousMousePosition.x;
+      const deltaY = e.clientY - previousMousePosition.y;
+      
+      scene.children.forEach(obj => {
+        if(obj instanceof THREE.Mesh) {
+          obj.rotation.x += deltaY * 0.01;
+          obj.rotation.y += deltaX * 0.01;
+        }
+      });
+      
+      previousMousePosition = { x: e.clientX, y: e.clientY };
+    }
+  });
+  
+  renderer.domElement.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+  
+  renderer.domElement.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    camera.position.z += e.deltaY * 0.5;
+  }, false);
+  
+  // Animation loop
+  const animate = () => {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  };
+  animate();
+  
+  // Handle resize
+  const handleResize = () => {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  };
+  
+  window.addEventListener('resize', handleResize);
+  modal.close = () => {
+    window.removeEventListener('resize', handleResize);
+    renderer.dispose();
+  };
+}
+
+function dataURItoArrayBuffer(dataURI) {
+  const binary = atob(dataURI.split(',')[1]);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for(let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+function isASCIISTL(arrayBuffer) {
+  const view = new Uint8Array(arrayBuffer);
+  const header = String.fromCharCode.apply(null, view.slice(0, 5));
+  return header === 'solid';
+}
+
+function parseBinarySTL(arrayBuffer, geometry) {
+  const view = new DataView(arrayBuffer);
+  const faces = view.getUint32(80, true);
+  const vertices = [];
+  const normals = [];
+  
+  let offset = 84;
+  for(let i = 0; i < faces; i++) {
+    const nx = view.getFloat32(offset, true); offset += 4;
+    const ny = view.getFloat32(offset, true); offset += 4;
+    const nz = view.getFloat32(offset, true); offset += 4;
+    
+    const v1x = view.getFloat32(offset, true); offset += 4;
+    const v1y = view.getFloat32(offset, true); offset += 4;
+    const v1z = view.getFloat32(offset, true); offset += 4;
+    
+    const v2x = view.getFloat32(offset, true); offset += 4;
+    const v2y = view.getFloat32(offset, true); offset += 4;
+    const v2z = view.getFloat32(offset, true); offset += 4;
+    
+    const v3x = view.getFloat32(offset, true); offset += 4;
+    const v3y = view.getFloat32(offset, true); offset += 4;
+    const v3z = view.getFloat32(offset, true); offset += 4;
+    
+    offset += 2; // attribute byte count
+    
+    vertices.push(v1x, v1y, v1z);
+    vertices.push(v2x, v2y, v2z);
+    vertices.push(v3x, v3y, v3z);
+    
+    normals.push(nx, ny, nz);
+    normals.push(nx, ny, nz);
+    normals.push(nx, ny, nz);
+  }
+  
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+  geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3));
+}
+
+function parseASCIISTL(arrayBuffer, geometry) {
+  const str = new TextDecoder().decode(arrayBuffer);
+  const vertices = [];
+  const normals = [];
+  
+  const vertexPattern = /vertex\s+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)/g;
+  const normalPattern = /facet\s+normal\s+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)/g;
+  
+  let normalMatch;
+  let vertexMatch;
+  let vertexCount = 0;
+  const vertexMatches = [...str.matchAll(vertexPattern)];
+  const normalMatches = [...str.matchAll(normalPattern)];
+  
+  vertexMatches.forEach((match, i) => {
+    vertices.push(parseFloat(match[1]), parseFloat(match[3]), parseFloat(match[5]));
+  });
+  
+  normalMatches.forEach((match, i) => {
+    const nx = parseFloat(match[1]);
+    const ny = parseFloat(match[3]);
+    const nz = parseFloat(match[5]);
+    normals.push(nx, ny, nz);
+    normals.push(nx, ny, nz);
+    normals.push(nx, ny, nz);
+  });
+  
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+  geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3));
+}
+
+// --- 3DXML PARSING ---
+function parse3DXMLComponents(xmlContent) {
+  const components = [];
+  try {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+    
+    if(xmlDoc.getElementsByTagName('parsererror').length > 0){
+      console.warn('XML parsing error');
+      return components;
+    }
+    
+    // Extract Reference3D elements (main components)
+    const reference3Ds = xmlDoc.getElementsByTagName('Reference3D');
+    for(let i = 0; i < reference3Ds.length; i++){
+      const ref = reference3Ds[i];
+      const name = ref.getAttribute('name') || `Component ${i+1}`;
+      const id = ref.getAttribute('id') || `comp_${i}`;
+      
+      // Extract geometry info
+      let vertexCount = 0;
+      let faceCount = 0;
+      
+      const tessellations = ref.getElementsByTagName('Tessellation');
+      if(tessellations.length > 0){
+        const tess = tessellations[0];
+        const vertexes = tess.getElementsByTagName('Vertexes');
+        const triangles = tess.getElementsByTagName('Triangles');
+        if(vertexes.length > 0){
+          const coords = vertexes[0].getAttribute('coords');
+          vertexCount = coords ? coords.split(' ').length / 3 : 0;
+        }
+        if(triangles.length > 0){
+          const ints = triangles[0].getAttribute('ints');
+          faceCount = ints ? ints.split(' ').length / 3 : 0;
+        }
+      }
+      
+      components.push({
+        id: id,
+        name: name,
+        type: ref.getAttribute('type') || 'Part',
+        vertices: vertexCount,
+        faces: faceCount,
+        hasGeometry: vertexCount > 0
+      });
+    }
+    
+    // Extract Instance3D elements (component instances)
+    const instances = xmlDoc.getElementsByTagName('Instance3D');
+    for(let i = 0; i < instances.length; i++){
+      const inst = instances[i];
+      const name = inst.getAttribute('name') || `Instance ${i+1}`;
+      const id = inst.getAttribute('id') || `inst_${i}`;
+      const refId = inst.getAttribute('ref');
+      
+      components.push({
+        id: id,
+        name: name,
+        type: 'Instance',
+        reference: refId,
+        hasGeometry: false
+      });
+    }
+  } catch(err){
+    console.error('3DXML parsing error:', err);
+  }
+  return components;
+}
+
+function displayComponentsIdentification(components, modelName) {
+  const container = document.getElementById('components-container');
+  
+  if(!components || components.length === 0){
+    container.innerHTML = `
+      <div style="text-align:center;color:var(--text-muted);padding:32px">
+        <div style="font-size:24px;margin-bottom:12px">⚠️</div>
+        لم يتم العثور على مكونات في هذا الملف
+      </div>
+    `;
+    return;
+  }
+  
+  const groupedByType = {};
+  components.forEach(comp => {
+    if(!groupedByType[comp.type]){
+      groupedByType[comp.type] = [];
+    }
+    groupedByType[comp.type].push(comp);
+  });
+  
+  let html = `
+    <div style="background:var(--card-bg);padding:16px;border-radius:var(--radius);margin-bottom:16px">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">ملف:</div>
+      <div style="font-size:13px;font-weight:600">${modelName}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;font-size:12px">
+        <div style="background:var(--primary);padding:10px;border-radius:6px;text-align:center">
+          <div style="font-size:20px">📦</div>
+          <div style="color:var(--text-muted);font-size:11px;margin-top:4px">إجمالي</div>
+          <div style="font-size:16px;font-weight:600;color:var(--gold);margin-top:4px">${components.length}</div>
+        </div>
+  `;
+  
+  Object.keys(groupedByType).forEach(type => {
+    const count = groupedByType[type].length;
+    const icon = type === 'Part' ? '⚙️' : type === 'Instance' ? '🔗' : '📦';
+    html += `
+      <div style="background:var(--primary);padding:10px;border-radius:6px;text-align:center">
+        <div style="font-size:20px">${icon}</div>
+        <div style="color:var(--text-muted);font-size:11px;margin-top:4px">${type}</div>
+        <div style="font-size:16px;font-weight:600;color:var(--gold2);margin-top:4px">${count}</div>
+      </div>
+    `;
+  });
+  
+  html += `</div></div>`;
+  
+  // Component list
+  html += `<div style="margin-top:16px"><div style="font-size:13px;font-weight:600;margin-bottom:12px">📋 قائمة المكونات التفصيلية:</div>`;
+  
+  Object.keys(groupedByType).forEach(type => {
+    html += `
+      <div style="margin-bottom:16px;border-left:3px solid var(--gold);padding-left:12px">
+        <div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:8px">${type}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px">
+    `;
+    
+    groupedByType[type].forEach((comp, idx) => {
+      let details = '';
+      if(comp.vertices){
+        details = `📊 رؤوس: ${comp.vertices}`;
+        if(comp.faces){
+          details += ` | وجوه: ${comp.faces}`;
+        }
+      }
+      
+      html += `
+        <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px;font-size:11px">
+          <div style="font-weight:600;margin-bottom:6px;color:var(--text)">${comp.name}</div>
+          <div style="color:var(--text-muted);font-size:10px;margin-bottom:4px">${comp.type}</div>
+          ${comp.reference ? `<div style="color:var(--text-muted);font-size:10px">📌 المرجع: ${comp.reference}</div>` : ''}
+          ${details ? `<div style="color:var(--gold2);font-size:10px;margin-top:4px">${details}</div>` : ''}
+          ${comp.hasGeometry ? `<div style="background:var(--primary);padding:4px;border-radius:4px;margin-top:4px;text-align:center;color:var(--gold);font-size:10px;font-weight:600">✓ به هندسة</div>` : ''}
+        </div>
+      `;
+    });
+    
+    html += `</div></div>`;
+  });
+  
+  html += `</div>`;
+  
+  container.innerHTML = html;
+}
+
+function openOnshapeUrl(url){
+  window.open(url, '_blank');
+}
+
+function loadModelUrl(){
+  // Legacy function - kept for backward compatibility
+  notify('استخدم خاصية "حفظ نموذج" أعلاه');
+}
+
+function addModel(){
+  const name=document.getElementById('m-name').value.trim();
+  const url=document.getElementById('m-url').value.trim();
+  if(!name||!url){notify('أدخل الاسم والرابط');return}
+  modelsData.push({name,url,part:document.getElementById('m-part').value});
+  renderModelsTable();
+  renderSketchfabModels();
+  updateStats();
+  saveState();
+  closeModal('add-model-modal');
+  notify('✅ تم إضافة النموذج');
+  ['m-name','m-url','m-part'].forEach(id=>document.getElementById(id).value='');
+}
+
+document.getElementById('model-file-input').addEventListener('change',function(){
+  const f=this.files[0];
+  if(!f)return;
+  
+  // Check file type
+  const ext = f.name.split('.').pop().toLowerCase();
+  const is3DFile = ['stl','obj','glb','gltf','stp','step','sldprt','sldasm','xml','3dxml'].includes(ext);
+  
+  if(is3DFile){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      let components = [];
+      let fileContent = e.target.result;
+      
+      // Parse 3DXML if applicable
+      if(ext === '3dxml' || ext === 'xml'){
+        try {
+          const text = typeof fileContent === 'string' ? fileContent : atob(fileContent.split(',')[1]);
+          components = parse3DXMLComponents(text);
+        } catch(err){
+          console.warn('Could not parse 3DXML:', err);
+          components = [];
+        }
+      }
+      
+      modelsData.push({
+        name: f.name,
+        url: fileContent,
+        part: 'ملف محلي',
+        type: ext,
+        isFile: true,
+        fileData: fileContent,
+        components: components,
+        rawContent: fileContent
+      });
+      renderModelsTable();
+      renderSketchfabModels();
+      updateStats();
+      saveState();
+      notify(`📁 تم إضافة الملف: ${f.name}${components.length > 0 ? ` (${components.length} مكون)` : ''}`);
+      this.value='';
+    };
+    
+    // Read as text for XML files, as data URL for binary files
+    if(ext === '3dxml' || ext === 'xml'){
+      reader.readAsText(f);
+    } else {
+      reader.readAsDataURL(f);
+    }
+  } else {
+    notify('❌ نوع الملف غير مدعوم. استخدم 3DXML, STL, OBJ, GLB، أو ملفات STEP');
+  }
+});
+
+// --- TEAM ---
+function renderTeam(){
+  const grid=document.getElementById('team-grid');
+  const colors=['var(--gold)','var(--gold2)','#4ade80','#60a5fa','#a78bfa','#f472b6'];
+  grid.innerHTML = teamData.map((m,i)=>`
+    <div class="card" style="text-align:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:18px;font-weight:700;color:var(--primary)">
+        ${m.name[0]||'?'}
+      </div>
+      <div style="font-weight:700;margin-bottom:4px">${m.name}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">${m.role}</div>
+      <div style="font-size:11px;color:var(--gold);font-family:'Orbitron'">${m.id||''}</div>
+      <button style="margin-top:12px" class="btn btn-outline btn-sm" onclick="removeMember(${i})">🗑</button>
+    </div>
+  `).join('')||'<div style="color:var(--text-muted);font-size:13px;grid-column:1/-1;text-align:center;padding:32px">أضف أعضاء الفريق</div>';
+}
+
+function addMember(){
+  const name=document.getElementById('tm-name').value.trim();
+  if(!name){notify('أدخل الاسم');return}
+  teamData.push({name,role:document.getElementById('tm-role').value,id:document.getElementById('tm-id').value});
+  renderTeam();
+  saveState();
+  closeModal('add-member-modal');
+  notify('✅ تم إضافة العضو');
+  ['tm-name','tm-role','tm-id'].forEach(id=>document.getElementById(id).value='');
+}
+function removeMember(i){teamData.splice(i,1);renderTeam();saveState();notify('🗑 تم حذف العضو')}
+
+// --- DASHBOARD CONTROLS ---
+function setAccentColor(c,el){
+  document.documentElement.style.setProperty('--gold',c);
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  saveState();
+  notify('🎨 تم تغيير اللون');
+}
+function setFont(f,el){
+  document.body.style.fontFamily=`'${f}',sans-serif`;
+  document.querySelectorAll('.font-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  saveState();
+}
+function togglePage(id,input){
+  const navEl=document.getElementById('nav-'+id);
+  const pageEl=document.getElementById('page-'+id);
+  if(navEl) navEl.style.display = input.checked ? 'flex' : 'none';
+  if(pageEl) pageEl.style.display = input.checked ? '' : 'none';
+  if(!input.checked && pageEl?.classList.contains('active')){
+    showPage('home');
+  }
+  saveState();
+}
+function updateSiteInfo(){
+  const title = document.getElementById('site-title').value;
+  const uni = document.getElementById('site-uni').value;
+  const desc = document.getElementById('site-desc').value;
+  document.querySelector('.logo h1').textContent = title || 'MDP181';
+  document.querySelector('.logo p').textContent = uni || 'Ain Shams University — Faculty of Engineering';
+  document.querySelector('.section-sub').textContent = desc || 'مشروع هندسة عكسية لتحليل مكونات أجهزة منزلية وتحديد موادها وعمليات تصنيعها';
+}
+function promptEditCode(){
+  if(confirm('تم حفظ الإعدادات. هل ترغب في فتح الملف reverse_engineering_site.html لتعديله؟')){
+    notify('افتح الملف في محرر الكود الآن.');
+  }
+}
+
+function saveSettings(){
+  updateSiteInfo();
+  saveState();
+  notify('💾 تم حفظ الإعدادات');
+  promptEditCode();
+}
+
+// --- STATS ---
+function updateStats(){
+  document.getElementById('stat-parts').textContent=PARTS_DATA.length;
+  const dc=document.getElementById('dash-parts-count');if(dc)dc.textContent=PARTS_DATA.length;
+  const vc=document.getElementById('dash-videos-count');if(vc)vc.textContent=videosData.length;
+  const mc=document.getElementById('dash-models-count');if(mc)mc.textContent=modelsData.length;
+}
+
+// --- MATERIALS CHART ---
+function renderMaterialsChart(){
+  const counts={};
+  PARTS_DATA.forEach(p=>{
+    const m = p.material.split('/')[0].trim().toLowerCase();
+    if(m.includes('thermoplastic'))counts['Thermoplastic']=(counts['Thermoplastic']||0)+1;
+    else if(m.includes('steel')||m.includes('carbon steel'))counts['Steel']=(counts['Steel']||0)+1;
+    else if(m.includes('copper'))counts['Copper']=(counts['Copper']||0)+1;
+    else if(m.includes('thermoset'))counts['Thermoset']=(counts['Thermoset']||0)+1;
+    else counts['Other']=(counts['Other']||0)+1;
+  });
+  const total=Object.values(counts).reduce((a,b)=>a+b,0);
+  const colors={'Thermoplastic':'var(--gold)','Steel':'#60a5fa','Copper':'#f59e0b','Thermoset':'#a78bfa','Other':'var(--text-muted)'};
+  document.getElementById('materials-chart').innerHTML=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([mat,cnt])=>`
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-size:12px;color:var(--text-muted);min-width:90px;text-align:right">${mat}</div>
+      <div style="flex:1;height:8px;background:var(--card-border);border-radius:4px;overflow:hidden">
+        <div style="width:${Math.round(cnt/total*100)}%;height:100%;background:${colors[mat]||'var(--gold)'};border-radius:4px"></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;min-width:20px">${cnt}</div>
+    </div>
+  `).join('');
+}
+
+let stlScene, stlCamera, stlRenderer, stlMesh;
+let stlWireframeMode = false;
+function uploadSTLFile(){
+const input=document.getElementById('stl-file-input');
+if(!input.files.length)return notify('اختر ملف STL');
+const file=input.files[0];
+if(!file.name.toLowerCase().endsWith('.stl'))return notify('يجب أن يكون الملف بصيغة STL');
+const reader=new FileReader();
+reader.onload=(e)=>{const ab=e.target.result;stlModels.push({name:file.name,data:ab,size:file.size});currentStlModelIndex=stlModels.length-1;loadSTLModel(currentStlModelIndex);renderSTLLibrary();updateStats();saveState();};
+reader.readAsArrayBuffer(file);
+input.value='';
+}
+function loadSTLModel(idx){
+if(idx<0||idx>=stlModels.length)return;
+const model=stlModels[idx];
+currentStlModelIndex=idx;
+const container=document.getElementById('viewer3d-wrapper');
+const placeholder=document.getElementById('viewer-placeholder');
+if(!stlRenderer){
+const w=container.clientWidth,h=container.clientHeight;
+stlScene=new THREE.Scene();stlScene.background=new THREE.Color(0x1a1a2e);
+stlCamera=new THREE.PerspectiveCamera(75,w/h,0.1,10000);stlCamera.position.z=150;
+stlRenderer=new THREE.WebGLRenderer({antialias:true,canvas:document.getElementById('stl-viewer-canvas')});
+stlRenderer.setSize(w,h);stlRenderer.setPixelRatio(window.devicePixelRatio);
+const l1=new THREE.DirectionalLight(0xffffff,1);l1.position.set(200,200,200);stlScene.add(l1);
+const l2=new THREE.DirectionalLight(0xffffff,.5);l2.position.set(-200,-200,-200);stlScene.add(l2);
+const al=new THREE.AmbientLight(0xffffff,.7);stlScene.add(al);
+let dragging=false,pX=0,pY=0;
+stlRenderer.domElement.addEventListener('mousedown',(e)=>{dragging=true;pX=e.clientX;pY=e.clientY;});
+stlRenderer.domElement.addEventListener('mousemove',(e)=>{if(dragging&&stlMesh){stlMesh.rotation.y+=(e.clientX-pX)*.01;stlMesh.rotation.x+=(e.clientY-pY)*.01;pX=e.clientX;pY=e.clientY;}});
+stlRenderer.domElement.addEventListener('mouseup',()=>{dragging=false;});
+stlRenderer.domElement.addEventListener('wheel',(e)=>{e.preventDefault();stlCamera.position.z+=e.deltaY*.5;});
+const animate=()=>{requestAnimationFrame(animate);stlRenderer.render(stlScene,stlCamera);};
+animate();
+window.addEventListener('resize',()=>{const nw=container.clientWidth,nh=container.clientHeight;stlCamera.aspect=nw/nh;stlCamera.updateProjectionMatrix();stlRenderer.setSize(nw,nh);});}
+if(stlMesh)stlScene.remove(stlMesh);
+placeholder.style.display='none';
+try{
+const geom=new THREE.BufferGeometry();
+const view=new DataView(model.data);
+const faces=view.getUint32(80,true);
+const verts=[],norms=[];
+let off=84;
+for(let i=0;i<faces;i++){
+const nx=view.getFloat32(off,true);off+=4;const ny=view.getFloat32(off,true);off+=4;const nz=view.getFloat32(off,true);off+=4;
+const v1x=view.getFloat32(off,true);off+=4;const v1y=view.getFloat32(off,true);off+=4;const v1z=view.getFloat32(off,true);off+=4;
+const v2x=view.getFloat32(off,true);off+=4;const v2y=view.getFloat32(off,true);off+=4;const v2z=view.getFloat32(off,true);off+=4;
+const v3x=view.getFloat32(off,true);off+=4;const v3y=view.getFloat32(off,true);off+=4;const v3z=view.getFloat32(off,true);off+=4;off+=2;
+verts.push(v1x,v1y,v1z,v2x,v2y,v2z,v3x,v3y,v3z);
+norms.push(nx,ny,nz,nx,ny,nz,nx,ny,nz);
+}
+geom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(verts),3));
+geom.setAttribute('normal',new THREE.BufferAttribute(new Float32Array(norms),3));
+geom.computeBoundingBox();
+const bbox=geom.boundingBox,ctr=new THREE.Vector3();bbox.getCenter(ctr);geom.translate(-ctr.x,-ctr.y,-ctr.z);
+const sz=bbox.getSize(new THREE.Vector3()),mx=Math.max(sz.x,sz.y,sz.z),sc=100/mx;
+const mat=new THREE.MeshPhongMaterial({color:0xe94560,emissive:0x1a1a2e,shininess:100,side:THREE.DoubleSide});
+stlMesh=new THREE.Mesh(geom,mat);stlMesh.scale.multiplyScalar(sc);stlScene.add(stlMesh);
+stlCamera.position.z=mx*1.5;
+const inf=document.getElementById('stl-model-info');
+inf.innerHTML=`<div><strong>الملف:</strong> ${model.name}</div><div><strong>الحجم:</strong> ${(model.size/1024).toFixed(1)} KB</div><div><strong>الرؤوس:</strong> ${verts.length/3}</div><div><strong>الوجوه:</strong> ${faces}</div><div><strong>الأبعاد X:</strong> ${sz.x.toFixed(2)}</div><div><strong>الأبعاد Y:</strong> ${sz.y.toFixed(2)}</div><div><strong>الأبعاد Z:</strong> ${sz.z.toFixed(2)}</div>`;
+notify('✅ تم تحميل النموذج بنجاح');
+}catch(e){notify('❌ خطأ في تحميل الملف: '+e.message);}}
+function resetSTLViewer(){if(stlMesh){stlMesh.rotation.set(0,0,0);stlCamera.position.set(0,0,150);}}
+function toggleWireframe(){if(stlMesh&&stlMesh.material){stlWireframeMode=!stlWireframeMode;stlMesh.material.wireframe=stlWireframeMode;notify(stlWireframeMode?'🕸️ وضع الشبكة':'📦 وضع عادي');}}
+function downloadCurrentSTL(){if(currentStlModelIndex<0||currentStlModelIndex>=stlModels.length)return;const m=stlModels[currentStlModelIndex];const b=new Blob([m.data],{type:'application/octet-stream'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=m.name;a.click();URL.revokeObjectURL(u);}
+function renderSTLLibrary(){const tb=document.getElementById('stl-library-body');if(!tb)return;if(stlModels.length===0){tb.innerHTML='<tr><td colspan="5" style="padding:24px;text-align:center;color:var(--text-muted)">لا توجد ملفات STL مُحملة بعد</td></tr>';return;}tb.innerHTML=stlModels.map((m,i)=>`<tr><td style="padding:11px 16px;text-align:center;color:var(--gold);font-family:Orbitron">${i+1}</td><td style="padding:11px 16px">${m.name}</td><td style="padding:11px 16px;color:var(--text-muted)">-</td><td style="padding:11px 16px;font-size:11px;color:var(--text-muted)">3D Model</td><td style="padding:11px 16px;text-align:center;white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="loadSTLModel(${i})" style="padding:4px 8px;font-size:11px">👁️ عرض</button><button class="btn btn-outline btn-sm" onclick="stlModels.splice(${i},1);renderSTLLibrary();updateStats();" style="padding:4px 8px;font-size:11px;margin-right:4px">🗑</button></td></tr>`).join('');}
+function renderMethodsOperationsPanel(){const p=document.getElementById('methods-operations-panel');const m=new Set(),o=new Set();PARTS_DATA.forEach(pt=>{if(pt.method)pt.method.split('/').forEach(x=>m.add(x.trim()));if(pt.mfg)pt.mfg.split('→').forEach(x=>o.add(x.trim()));});if(p){let h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div><div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:12px">🔍 طرق التعريف</div><div style="display:flex;flex-wrap:wrap;gap:8px">';m.forEach(mt=>{const c=PARTS_DATA.filter(pt=>pt.method?.includes(mt)).length;h+=`<div style="background:var(--card-bg);padding:8px 12px;border-radius:6px;font-size:11px;border-left:3px solid var(--gold2)"><div>${mt}</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">${c} أجزاء</div></div>`;});h+='</div></div><div><div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:12px">🔨 طرق التصنيع</div><div style="display:flex;flex-wrap:wrap;gap:8px">';o.forEach(op=>{const c=PARTS_DATA.filter(pt=>pt.mfg?.includes(op)).length;h+=`<div style="background:var(--card-bg);padding:8px 12px;border-radius:6px;font-size:11px;border-left:3px solid var(--gold)"><div>${op}</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">${c} أجزاء</div></div>`;});h+='</div></div></div>';p.innerHTML=m.size>0||o.size>0?h:'<div style="text-align:center;color:var(--text-muted);padding:16px">لا توجد طرق مسجلة بعد</div>';}}
+loadState();
+renderParts();
+renderMethodsOperationsPanel();
+renderVideos();
+renderModelsTable();
+renderSketchfabModels();
+renderTeam();
+renderMaterialsChart();
+updateStats();
+</script>
+</body>
+</html>

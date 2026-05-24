@@ -71,6 +71,8 @@ body[dir="rtl"] nav{left:auto;right:50%;transform:translateX(50%)}
 .presentation-frame:hover{transform:translateY(-6px)}
 .presentation-embed{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.16)}
 .presentation-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.embed-fallback{display:flex;align-items:center;justify-content:center;height:100%;background:rgba(0,0,0,0.28);border-radius:12px}
+.embed-fallback a{display:inline-block;padding:12px 18px;border-radius:999px;background:linear-gradient(90deg,#00d9ff22,#7be8ff22);color:var(--text);text-decoration:none;border:1px solid rgba(255,255,255,0.06)}
 .fullscreen-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;padding:12px 22px;border-radius:999px;border:1px solid rgba(0,217,255,0.35);background:rgba(0,217,255,0.12);color:#fff;font-weight:700;text-decoration:none;transition:transform .25s ease,background .25s ease;}
 .fullscreen-btn:hover{transform:translateY(-2px);background:rgba(0,217,255,0.2);}
 .grid{display:grid;gap:24px}
@@ -428,7 +430,7 @@ editToggleBtn.className = 'edit-toggle';
 editToggleBtn.type = 'button';
 editToggleBtn.textContent = 'Edit';
 const menuEl = document.querySelector('nav .menu');
-if (menuEl) menuEl.insertBefore(editToggleBtn, menuEl.children[1]);
+if (menuEl) menuEl.insertBefore(editToggleBtn, menuEl.children[1] || null);
 const soundToggleBtn = document.querySelector('#sound-toggle');
 const soundIconEl = document.querySelector('#sound-icon');
 const soundLabelEl = document.querySelector('#sound-label');
@@ -791,17 +793,31 @@ function applySiteData(snapshot) {
   if (snapshot.hero && snapshot.hero.videoSrc) {
     const hf = document.querySelector('#hero-video-iframe');
     const safe = sanitizeIframeUrl(snapshot.hero.videoSrc);
-    if (hf && safe) hf.src = snapshot.hero.videoSrc;
+    if (hf && safe) {
+      hf.src = snapshot.hero.videoSrc;
+    } else if (hf) {
+      // replace iframe with fallback link
+      const parent = hf.parentElement;
+      if (parent) parent.innerHTML = `<div class="embed-fallback"><a href="${snapshot.hero.videoSrc}" target="_blank" rel="noopener">Open video</a></div>`;
+    }
   }
   if (snapshot.podcast && snapshot.podcast.soundcloudSrc) {
     const sc = document.querySelector('.audio-embed iframe');
     const safe = sanitizeIframeUrl(snapshot.podcast.soundcloudSrc);
     if (sc && safe) sc.src = snapshot.podcast.soundcloudSrc;
+    else if (sc) {
+      const parent = sc.parentElement;
+      if (parent) parent.innerHTML = `<div class="embed-fallback"><a href="${snapshot.podcast.soundcloudSrc}" target="_blank" rel="noopener">Open audio</a></div>`;
+    }
   }
   if (snapshot.presentation && snapshot.presentation.drivePreview) {
     const pr = document.querySelector('.presentation-embed iframe');
     const safe = sanitizeIframeUrl(snapshot.presentation.drivePreview);
     if (pr && safe) pr.src = snapshot.presentation.drivePreview;
+    else if (pr) {
+      const parent = pr.parentElement;
+      if (parent) parent.innerHTML = `<div class="embed-fallback"><a href="${snapshot.presentation.drivePreview}" target="_blank" rel="noopener">Open presentation</a></div>`;
+    }
     const fs = document.querySelector('.fullscreen-btn');
     if (fs && safe) fs.href = snapshot.presentation.drivePreview;
   }
@@ -809,6 +825,10 @@ function applySiteData(snapshot) {
     const mf = document.querySelector('#model-iframe');
     const safe = sanitizeIframeUrl(snapshot.model.onshapeUrl);
     if (mf && safe) mf.src = snapshot.model.onshapeUrl;
+    else if (mf) {
+      const parent = mf.parentElement;
+      if (parent) parent.innerHTML = `<div class="embed-fallback"><a href="${snapshot.model.onshapeUrl}" target="_blank" rel="noopener">Open 3D Model</a></div>`;
+    }
     const fsl = document.querySelector('#fullscreen-model');
     if (fsl && safe) fsl.href = snapshot.model.onshapeUrl;
   }
@@ -934,67 +954,86 @@ setLanguage = function(lang) {
   });
 };
 
-  const particleLayer = document.createElement('div');
-  particleLayer.style.position = 'absolute';
-  particleLayer.style.inset = '0';
-  particleLayer.style.pointerEvents = 'none';
-  hero.appendChild(particleLayer);
-  for (let i = 0; i < 18; i++) {
-    const dot = document.createElement('div');
-    const size = 4 + Math.random() * 10;
-    dot.className = 'particle';
-    dot.style.width = `${size}px`;
-    dot.style.height = `${size}px`;
-    dot.style.background = 'rgba(0,217,255,0.75)';
-    dot.style.filter = 'blur(1px)';
-    dot.style.opacity = `${0.16 + Math.random() * 0.36}`;
-    dot.style.left = `${Math.random() * 100}%`;
-    dot.style.top = `${Math.random() * 100}%`;
-    dot.style.transform = `translate(-50%, -50%) scale(${0.6 + Math.random() * 0.8})`;
-    particleLayer.appendChild(dot);
-    particles.push({el: dot, x: Math.random()*100, y: Math.random()*100, vx:(Math.random()-0.5)*0.02, vy:(Math.random()-0.5)*0.02});
+if (hero) {
+  try {
+    const particleLayer = document.createElement('div');
+    particleLayer.style.position = 'absolute';
+    particleLayer.style.inset = '0';
+    particleLayer.style.pointerEvents = 'none';
+    hero.appendChild(particleLayer);
+    for (let i = 0; i < 18; i++) {
+      const dot = document.createElement('div');
+      const size = 4 + Math.random() * 10;
+      dot.className = 'particle';
+      dot.style.width = `${size}px`;
+      dot.style.height = `${size}px`;
+      dot.style.background = 'rgba(0,217,255,0.75)';
+      dot.style.filter = 'blur(1px)';
+      dot.style.opacity = `${0.16 + Math.random() * 0.36}`;
+      dot.style.left = `${Math.random() * 100}%`;
+      dot.style.top = `${Math.random() * 100}%`;
+      dot.style.transform = `translate(-50%, -50%) scale(${0.6 + Math.random() * 0.8})`;
+      particleLayer.appendChild(dot);
+      particles.push({el: dot, x: Math.random()*100, y: Math.random()*100, vx:(Math.random()-0.5)*0.02, vy:(Math.random()-0.5)*0.02});
+    }
+    function animateParticles() {
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > 100) p.vx *= -1;
+        if (p.y < 0 || p.y > 100) p.vy *= -1;
+        p.el.style.left = `${p.x}%`;
+        p.el.style.top = `${p.y}%`;
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  } catch (err) {
+    console.warn('Particle animation failed', err);
   }
-  function animateParticles() {
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0 || p.x > 100) p.vx *= -1;
-      if (p.y < 0 || p.y > 100) p.vy *= -1;
-      p.el.style.left = `${p.x}%`;
-      p.el.style.top = `${p.y}%`;
-    });
-    requestAnimationFrame(animateParticles);
-  }
-  animateParticles();
 }
-const heroTitle = document.querySelector('.hero-title');
-hero.addEventListener('mousemove', (event) => {
-  if (prefersReduced) return;
-  const x = (event.clientX / window.innerWidth - 0.5) * 16;
-  const y = (event.clientY / window.innerHeight - 0.5) * 16;
-  heroTitle.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-});
-window.addEventListener('scroll', () => {
-  const scrolled = window.scrollY / 5;
-  hero.style.backgroundPosition = `center ${scrolled}px`;
-});
-const tiltCards = document.querySelectorAll('.tilt-card');
-tiltCards.forEach(card => {
-  card.addEventListener('mousemove', (event) => {
-    if (prefersReduced) return;
-    const rect = card.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * 8;
-    const rotateY = ((x - centerX) / centerX) * -8;
-    card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+if (hero) {
+  const heroTitle = document.querySelector('.hero-title');
+  try {
+    hero.addEventListener('mousemove', (event) => {
+      if (prefersReduced) return;
+      const x = (event.clientX / window.innerWidth - 0.5) * 16;
+      const y = (event.clientY / window.innerHeight - 0.5) * 16;
+      if (heroTitle) heroTitle.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    });
+  } catch (err) {
+    console.warn('Hero mousemove handler failed', err);
+  }
+  try {
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY / 5;
+      hero.style.backgroundPosition = `center ${scrolled}px`;
+    });
+  } catch (err) {
+    console.warn('Scroll handler failed', err);
+  }
+}
+try {
+  const tiltCards = document.querySelectorAll('.tilt-card');
+  tiltCards.forEach(card => {
+    card.addEventListener('mousemove', (event) => {
+      if (prefersReduced) return;
+      const rect = card.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * 8;
+      const rotateY = ((x - centerX) / centerX) * -8;
+      card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
+    });
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
-  });
-});
+} catch (err) {
+  console.warn('Tilt card handlers failed', err);
+}
 </script>
 </body>
 </html>

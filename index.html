@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -25,14 +25,25 @@ html{scroll-behavior:smooth}
 body{font-family:'Inter',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 button,a{font:inherit}
 img,iframe{max-width:100%;display:block}
+body, h1, h2, h3, h4, h5, h6, p, li, a, button, span {word-wrap:break-word;overflow-wrap:break-word;}
 ::selection{background:rgba(0,217,255,0.24)}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 10%,rgba(0,217,255,0.16),transparent 18%),radial-gradient(circle at 80% 40%,rgba(58,123,255,0.14),transparent 20%),radial-gradient(circle at 60% 85%,rgba(3,190,204,0.09),transparent 24%);pointer-events:none;z-index:-2}
-#page-wrap{position:relative;overflow:hidden}
+#page-wrap{position:relative;overflow:visible;max-width:1240px;margin:0 auto}
 nav{position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:99;width:min(100%,1080px);padding:0 24px;display:flex;justify-content:space-between;align-items:center;gap:18px;backdrop-filter:blur(18px);background:rgba(6,9,20,0.62);border:1px solid rgba(255,255,255,0.08);border-radius:999px;box-shadow:var(--shadow)}
 nav .brand{font-family:'Orbitron',sans-serif;font-size:0.92rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--accent)}
 nav .menu{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
 nav .menu a{color:var(--muted);text-decoration:none;font-size:0.92rem;transition:color .25s ease}
 nav .menu a:hover{color:var(--text)}
+button.lang-switch, .sound-btn{font-size:0.92rem;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer;transition:transform .25s ease,background .25s ease,border-color .25s ease}
+button.lang-switch:hover, .sound-btn:hover{transform:translateY(-1px);background:rgba(0,217,255,0.14);border-color:rgba(0,217,255,0.4)}
+.hero-controls{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:10px}
+.sound-btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.02em;box-shadow:0 14px 35px rgba(0,217,255,0.16)}
+.sound-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:rgba(0,217,255,0.16);color:var(--accent);transition:transform .25s ease}
+.sound-btn.active .sound-icon{transform:scale(1.08)}
+.sound-btn.active{background:rgba(0,217,255,0.24);border-color:rgba(0,217,255,0.6)}
+button.edit-toggle{font-size:0.88rem;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text);cursor:pointer;margin-right:6px}
+button.edit-toggle.active{background:linear-gradient(90deg,rgba(0,217,255,0.14),rgba(140,140,255,0.06));border-color:rgba(0,217,255,0.44)}
+.editable{outline:2px dashed rgba(0,217,255,0.12);padding:2px}
 .hero{position:relative;min-height:100vh;display:grid;place-items:center;padding:0 24px;overflow:hidden}
 .hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,6,15,0.22),rgba(5,6,15,0.92));pointer-events:none;z-index:1}
 .hero-video{position:absolute;inset:0;overflow:hidden;z-index:0}
@@ -48,9 +59,20 @@ nav .menu a:hover{color:var(--text)}
 .hero-meta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:0.92rem;color:var(--muted);margin-top:2rem}
 .meta-pill{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04)}
 .meta-pill span{display:inline-flex;align-items:center;justify-content:center;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+body[dir="rtl"]{direction:rtl}
+body[dir="rtl"] .hero-content,body[dir="rtl"] .section,body[dir="rtl"] .presentation-banner,body[dir="rtl"] .team-card{direction:rtl;text-align:right}
+body[dir="rtl"] nav{left:auto;right:50%;transform:translateX(50%)}
 .section{position:relative;padding:120px 24px 80px;max-width:var(--max-width);margin:0 auto}
-.section-title{font-size:clamp(2.1rem,2.6vw,3rem);line-height:1.05;font-weight:800;letter-spacing:-0.04em;margin-bottom:10px}
+.section-title{font-size:clamp(2.1rem,2.6vw,3rem);line-height:1.05;font-weight:800;letter-spacing:-0.04em;margin-bottom:10px;color:transparent;background:linear-gradient(90deg,#7be8ff,#8c8fff);-webkit-background-clip:text;background-clip:text;text-shadow:0 0 18px rgba(0,217,255,0.12);}
+.section-subtitle{font-size:1rem;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-top:8px;margin-bottom:20px;opacity:.92;}
 .section-copy{max-width:720px;color:var(--muted);line-height:1.9;font-size:1rem;margin-bottom:42px}
+.presentation-panel{margin-bottom:30px;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:18px;}
+.presentation-frame{background:rgba(12,16,28,0.94);border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 100px rgba(0,0,0,0.28);padding:24px;backdrop-filter:blur(18px);transition:transform .5s ease}
+.presentation-frame:hover{transform:translateY(-6px)}
+.presentation-embed{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.16)}
+.presentation-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.fullscreen-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;padding:12px 22px;border-radius:999px;border:1px solid rgba(0,217,255,0.35);background:rgba(0,217,255,0.12);color:#fff;font-weight:700;text-decoration:none;transition:transform .25s ease,background .25s ease;}
+.fullscreen-btn:hover{transform:translateY(-2px);background:rgba(0,217,255,0.2);}
 .grid{display:grid;gap:24px}
 .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -91,12 +113,27 @@ nav .menu a:hover{color:var(--text)}
 .podcast-button{padding:12px 26px;border-radius:999px;border:1px solid rgba(0,217,255,0.4);background:rgba(0,217,255,0.1);color:#fff;font-weight:700;cursor:pointer;transition:transform .25s ease,background .25s ease}
 .podcast-button:hover{transform:translateY(-2px);background:rgba(0,217,255,0.2)}
 .presentation{position:relative}
-.presentation-frame{background:rgba(12,16,28,0.94);border-radius:32px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);box-shadow:0 40px 100px rgba(0,0,0,0.28)}
-.presentation-frame iframe{width:100%;min-height:720px;border:none}
+.presentation-frame{background:rgba(12,16,28,0.94);border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 100px rgba(0,0,0,0.28);padding:24px;backdrop-filter:blur(18px);transition:transform .5s ease}
+.presentation-frame:hover{transform:translateY(-6px)}
+.presentation-embed{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.16)}
+.presentation-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
 .presentation-banner{margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .presentation-banner h2{font-size:2rem;line-height:1.05}
 .presentation-banner p{color:var(--muted);max-width:540px}
 .section-footnote{margin-top:18px;color:var(--muted);font-size:0.95rem}
+.model-section{position:relative;padding:120px 24px 80px;max-width:var(--max-width);margin:0 auto}
+.model-panel{margin-bottom:30px;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:18px}
+.model-title{font-size:clamp(2.1rem,2.6vw,3rem);line-height:1.05;font-weight:800;letter-spacing:-0.04em;margin-bottom:10px;color:transparent;background:linear-gradient(90deg,#7be8ff,#8c8fff);-webkit-background-clip:text;background-clip:text;text-shadow:0 0 18px rgba(0,217,255,0.12);}
+.model-subtitle{font-size:1rem;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-top:8px;margin-bottom:20px;opacity:.92;}
+.model-card{background:rgba(12,16,28,0.92);border:1px solid rgba(0,217,255,0.18);border-radius:28px;box-shadow:0 50px 120px rgba(0,217,255,0.12);padding:24px;overflow:hidden;position:relative;backdrop-filter:blur(22px)}
+.model-card::before{content:'';position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(0,217,255,0.22),transparent 40%,rgba(95,180,255,0.18));pointer-events:none;filter:blur(18px)}
+.model-loader{position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#fff;font-weight:700;z-index:2;opacity:1;transition:opacity .35s ease;}
+.model-loader.hidden{opacity:0;pointer-events:none}
+.model-loader span{display:inline-flex;width:48px;height:48px;border:3px solid rgba(0,217,255,0.4);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.model-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.model-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:999px;border:1px solid rgba(0,217,255,0.3);background:rgba(0,217,255,0.08);color:#fff;font-weight:700;cursor:pointer;transition:transform .25s ease,background .25s ease}
+.model-button:hover{transform:translateY(-2px);background:rgba(0,217,255,0.18);}
+@keyframes spin{to{transform:rotate(360deg)}}
 .team-section{padding:80px 24px 40px;}
 .team-card{background:rgba(6,15,28,0.78);border:1px solid rgba(0,217,255,0.18);box-shadow:0 40px 120px rgba(0,217,255,0.12);padding:44px;max-width:900px;margin:0 auto;position:relative;overflow:hidden;transition:transform .35s ease,background .35s ease,border-color .35s ease}
 .team-card::before{content:'';position:absolute;inset:-2px;background:linear-gradient(135deg,rgba(0,217,255,0.18),transparent 48%,rgba(96,196,255,0.12));pointer-events:none;filter:blur(18px)}
@@ -118,7 +155,8 @@ nav .menu a:hover{color:var(--text)}
 .reveal.active{opacity:1;transform:translateY(0)}
 .particle{position:absolute;border-radius:50%;pointer-events:none}
 @media(max-width:1080px){.overview-grid,.podcast-grid{grid-template-columns:1fr}}
-@media(max-width:840px){nav{left:16px;transform:none;width:calc(100% - 32px)}.hero{padding:0 16px}.hero-title{font-size:3.8rem}.hero-copy{font-size:0.98rem}.section{padding:100px 16px 60px}.section-title{font-size:2.3rem}.grid-2,.grid-3{grid-template-columns:1fr}.card-title{font-size:1.35rem}.presentation-frame iframe{min-height:620px}}
+@media(max-width:840px){nav{left:16px;transform:none;width:calc(100% - 32px)}.hero{padding:0 16px}.hero-title{font-size:3.8rem}.hero-copy{font-size:0.98rem}.section{padding:100px 16px 60px}.section-title{font-size:2.3rem}.grid-2,.grid-3{grid-template-columns:1fr}.card-title{font-size:1.35rem}.presentation-embed iframe{min-height:620px}.model-panel{flex-direction:column;align-items:flex-start}.model-card{padding:20px}.model-controls{justify-content:flex-start}.model-card .presentation-embed iframe{min-height:420px}}
+@media(min-width:1081px){#page-wrap{overflow:visible}}
 @media(max-width:640px){nav{padding:14px 18px}.menu{gap:10px}.hero-title{font-size:2.8rem}.hero-meta{flex-direction:column}.hero-copy{max-width:100%}.cta-group{flex-direction:column}.section{padding:80px 16px 60px}.card-list li{font-size:0.95rem}.podcast-actions{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
@@ -127,29 +165,37 @@ nav .menu a:hover{color:var(--text)}
   <nav>
     <div class="brand">Apex Engineering Exhibit</div>
     <div class="menu">
-      <a href="#overview">Overview</a>
-      <a href="#podcast">Podcast</a>
-      <a href="#presentation">Presentation</a>
-      <a href="#contact">Contact</a>
+      <button class="lang-switch" id="lang-switch" type="button" aria-label="Switch language">EN</button>
+      <a href="#overview" data-i18n="navOverview">Overview</a>
+      <a href="#podcast" data-i18n="navPodcast">Podcast</a>
+      <a href="#presentation" data-i18n="navPresentation">Presentation</a>
+      <a href="#model3d" data-i18n="navModel3D">3D Model</a>
+      <a href="#contact" data-i18n="navContact">Contact</a>
     </div>
   </nav>
 
   <section class="hero" id="hero">
     <div class="hero-video" aria-hidden="true">
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/iZSwlZ-T_e8?si=WyX616Q5axPHaCdx&autoplay=1&mute=1&loop=1&playlist=iZSwlZ-T_e8&controls=0&modestbranding=1&rel=0" title="Cinematic engineering showcase" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <iframe id="hero-video-iframe" width="100%" height="100%" src="https://www.youtube.com/embed/iZSwlZ-T_e8?autoplay=1&mute=1&loop=1&playlist=iZSwlZ-T_e8&enablejsapi=1&controls=0" title="Project Intro Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
     <div class="hero-content">
-      <span class="hero-tag">FUTURE ENGINEERING EXPERIENCE</span>
-      <h1 class="hero-title">Project Nexus: Intelligent Infrastructure</h1>
-      <p class="hero-copy">A cinematic exhibition of smart engineering systems, advanced design workflows, and immersive storytelling for the next generation of infrastructure innovation.</p>
+      <span class="hero-tag" data-i18n="heroTag">FUTURE ENGINEERING EXPERIENCE</span>
+      <h1 class="hero-title" data-i18n="heroTitle">Project Nexus: Intelligent Infrastructure</h1>
+      <p class="hero-copy" data-i18n="heroCopy">A cinematic exhibition of smart engineering systems, advanced design workflows, and immersive storytelling for the next generation of infrastructure innovation.</p>
       <div class="cta-group">
-        <a class="cta-btn" href="#overview">Explore Project</a>
-        <a class="cta-btn secondary" href="#presentation">View Presentation</a>
+        <a class="cta-btn" href="#overview" data-i18n="heroCtaExplore">Explore Project</a>
+        <a class="cta-btn secondary" href="#presentation" data-i18n="heroCtaView">View Presentation</a>
+      </div>
+      <div class="hero-controls">
+        <button id="sound-toggle" class="sound-btn" type="button" aria-label="Toggle hero sound">
+          <span class="sound-icon" id="sound-icon">🔇</span>
+          <span class="sound-label" id="sound-label">Sound Off</span>
+        </button>
       </div>
       <div class="hero-meta">
-        <span class="meta-pill"><span></span>Advanced modeling</span>
-        <span class="meta-pill"><span></span>Neon glass interfaces</span>
-        <span class="meta-pill"><span></span>Responsive immersion</span>
+        <span class="meta-pill"><span></span><span data-i18n="heroMeta1">Advanced modeling</span></span>
+        <span class="meta-pill"><span></span><span data-i18n="heroMeta2">Neon glass interfaces</span></span>
+        <span class="meta-pill"><span></span><span data-i18n="heroMeta3">Responsive immersion</span></span>
       </div>
     </div>
     <div class="bg-circle one"></div>
@@ -158,54 +204,54 @@ nav .menu a:hover{color:var(--text)}
   </section>
 
   <section class="section reveal" id="overview">
-    <p class="section-title">Project Overview</p>
-    <p class="section-copy">Discover the core engineering vision behind Project Nexus. This exhibit blends structural innovation, embedded intelligence, and cinematic presentation to showcase a futuristic product launch experience.</p>
+    <p class="section-title" data-i18n="overviewTitle">Project Overview</p>
+    <p class="section-copy" data-i18n="overviewCopy">Discover the core engineering vision behind Project Nexus. This exhibit blends structural innovation, embedded intelligence, and cinematic presentation to showcase a futuristic product launch experience.</p>
     <div class="overview-grid">
       <div class="overview-panel">
         <article class="glass-card tilt-card">
-          <span class="card-label">Mission</span>
-          <h3 class="card-title">Redefining intelligent infrastructure</h3>
-          <p class="card-text">Project Nexus is a platform for high-performance systems that integrate adaptive controls, environmental sensing, and immersive visualization in one seamless experience.</p>
+          <span class="card-label" data-i18n="missionLabel">Mission</span>
+          <h3 class="card-title" data-i18n="missionTitle">Redefining intelligent infrastructure</h3>
+          <p class="card-text" data-i18n="missionText">Project Nexus is a platform for high-performance systems that integrate adaptive controls, environmental sensing, and immersive visualization in one seamless experience.</p>
           <ul class="card-list">
-            <li><span></span>Smart aerospace-inspired structure</li>
-            <li><span></span>Sensor-driven automation loops</li>
-            <li><span></span>Data-first engineering narrative</li>
+            <li><span></span><span data-i18n="missionItem1">Smart aerospace-inspired structure</span></li>
+            <li><span></span><span data-i18n="missionItem2">Sensor-driven automation loops</span></li>
+            <li><span></span><span data-i18n="missionItem3">Data-first engineering narrative</span></li>
           </ul>
         </article>
         <article class="glass-card tilt-card">
-          <span class="card-label">Impact</span>
-          <h3 class="card-title">Exhibition-level storytelling</h3>
-          <p class="card-text">A polished, cinematic interface that presents complex engineering concepts as digestible, interactive story beats for stakeholders and technical audiences alike.</p>
+          <span class="card-label" data-i18n="impactLabel">Impact</span>
+          <h3 class="card-title" data-i18n="impactTitle">Exhibition-level storytelling</h3>
+          <p class="card-text" data-i18n="impactText">A polished, cinematic interface that presents complex engineering concepts as digestible, interactive story beats for stakeholders and technical audiences alike.</p>
           <div class="badge-row">
-            <span class="badge-pill">Innovation</span>
-            <span class="badge-pill">Simulation</span>
-            <span class="badge-pill">Presentation</span>
+            <span class="badge-pill" data-i18n="badgeInnovation">Innovation</span>
+            <span class="badge-pill" data-i18n="badgeSimulation">Simulation</span>
+            <span class="badge-pill" data-i18n="badgePresentation">Presentation</span>
           </div>
         </article>
       </div>
       <div class="overview-panel">
         <div class="glass-card tilt-card">
-          <span class="card-label">Objectives</span>
-          <h3 class="card-title">Defined goals</h3>
+          <span class="card-label" data-i18n="objectivesLabel">Objectives</span>
+          <h3 class="card-title" data-i18n="objectivesTitle">Defined goals</h3>
           <div class="feature-lists">
             <div>
-              <div class="feature-item"><span class="feature-dot"></span><strong>Design modular systems</strong> for scalable engineering deployment.</div>
-              <div class="feature-item"><span class="feature-dot"></span><strong>Streamline analytics</strong> through automated monitoring dashboards.</div>
+              <div class="feature-item"><span class="feature-dot"></span><strong data-i18n="feature1Title">Design modular systems</strong> <span data-i18n="feature1Text">for scalable engineering deployment.</span></div>
+              <div class="feature-item"><span class="feature-dot"></span><strong data-i18n="feature2Title">Streamline analytics</strong> <span data-i18n="feature2Text">through automated monitoring dashboards.</span></div>
             </div>
             <div>
-              <div class="feature-item"><span class="feature-dot"></span><strong>Create immersive demos</strong> using cinematic motion and audio cues.</div>
-              <div class="feature-item"><span class="feature-dot"></span><strong>Optimize for responsiveness</strong> across desktop and mobile devices.</div>
+              <div class="feature-item"><span class="feature-dot"></span><strong data-i18n="feature3Title">Create immersive demos</strong> <span data-i18n="feature3Text">using cinematic motion and audio cues.</span></div>
+              <div class="feature-item"><span class="feature-dot"></span><strong data-i18n="feature4Title">Optimize for responsiveness</strong> <span data-i18n="feature4Text">across desktop and mobile devices.</span></div>
             </div>
           </div>
         </div>
         <div class="glass-card tilt-card">
-          <span class="card-label">Technologies</span>
-          <h3 class="card-title">Future-ready stack</h3>
-          <p class="card-text">Combining UI mastery with interactive media, the project deploys advanced web rendering, embedded audio/video, and responsive design systems.</p>
+          <span class="card-label" data-i18n="technologiesLabel">Technologies</span>
+          <h3 class="card-title" data-i18n="technologiesTitle">Future-ready stack</h3>
+          <p class="card-text" data-i18n="technologiesText">Combining UI mastery with interactive media, the project deploys advanced web rendering, embedded audio/video, and responsive design systems.</p>
           <div class="badge-row">
-            <span class="badge-pill">Dark mode</span>
-            <span class="badge-pill">Glassmorphism</span>
-            <span class="badge-pill">3D interaction</span>
+            <span class="badge-pill" data-i18n="badgeDarkMode">Dark mode</span>
+            <span class="badge-pill" data-i18n="badgeGlassmorphism">Glassmorphism</span>
+            <span class="badge-pill" data-i18n="badge3D">3D interaction</span>
           </div>
         </div>
       </div>
@@ -215,95 +261,679 @@ nav .menu a:hover{color:var(--text)}
   <section class="section podcast reveal" id="podcast">
     <div class="podcast-head">
       <div>
-        <p class="section-title">Listen to the Project Explanation</p>
-        <p class="section-copy">Tune into an audio walkthrough that explains the engineering concepts, system architecture, and cinematic design behind the project.</p>
+        <p class="section-title" data-i18n="podcastTitle">Engineering Briefing</p>
+        <p class="section-copy" data-i18n="podcastCopy">Tune into an audio walkthrough that explains the engineering concepts, system architecture, and cinematic design behind the project.</p>
       </div>
     </div>
     <div class="podcast-grid">
       <div class="podcast-card tilt-card">
-        <p class="card-label">Audio Narrative</p>
-        <p class="podcast-copy">A futuristic podcast-style user experience combines voice narration, immersive waveform animation, and performance-focused audio controls.</p>
+        <p class="card-label" data-i18n="audioLabel">Design Briefing</p>
+        <p class="podcast-copy" data-i18n="audioCopy">A futuristic podcast-style user experience combines voice narration, immersive waveform animation, and performance-focused audio controls.</p>
         <div class="waveform"></div>
         <div class="audio-embed">
           <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2326350512&color=%2300d9ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
         </div>
         <div class="podcast-actions">
-          <button type="button" class="podcast-button">Play the briefing</button>
-          <button type="button" class="podcast-button">Explore audio insights</button>
+          <button type="button" class="podcast-button" data-i18n="playBriefing">Play the briefing</button>
+          <button type="button" class="podcast-button" data-i18n="exploreInsights">Explore audio insights</button>
         </div>
       </div>
       <div class="podcast-card tilt-card">
-        <span class="card-label">Interactive Experience</span>
-        <h3 class="card-title">Floating waveform interface</h3>
-        <p class="card-text">The section blends a glowing audio container with motion effects and soft neon highlights to feel like a control room display.</p>
+        <span class="card-label" data-i18n="interactiveLabel">Control Room Interface</span>
+        <h3 class="card-title" data-i18n="interactiveTitle">Floating waveform interface</h3>
+        <p class="card-text" data-i18n="interactiveText">The section blends a glowing audio container with motion effects and soft neon highlights to feel like a control room display.</p>
         <ul class="card-list">
-          <li><span></span>Animated waveform background</li>
-          <li><span></span>Hover-activated glow controls</li>
-          <li><span></span>Responsive audio canvas</li>
+          <li><span></span><span data-i18n="featureAudio1">Animated waveform background</span></li>
+          <li><span></span><span data-i18n="featureAudio2">Hover-activated glow controls</span></li>
+          <li><span></span><span data-i18n="featureAudio3">Responsive audio canvas</span></li>
         </ul>
       </div>
     </div>
   </section>
 
   <section class="section reveal" id="presentation">
-    <div class="presentation-banner">
+    <div class="presentation-panel">
       <div>
-        <p class="section-title">Presentation Viewer</p>
-        <p class="section-copy">Review the core slide deck inside a modern viewer designed for immersive project storytelling and technical demonstrations.</p>
+        <p class="section-title" data-i18n="presentationTitle">Engineering Presentation</p>
+        <p class="section-subtitle" data-i18n="presentationSubtitle">Team 9 - Section 3 Official Report</p>
+        <p class="section-copy" data-i18n="presentationCopy">Review the core slide deck inside a modern viewer designed for immersive project storytelling and technical demonstrations.</p>
       </div>
-      <div class="badge-pill">Full-width showcase</div>
+      <div class="badge-pill" data-i18n="presentationBadge">Full-width showcase</div>
     </div>
     <div class="presentation-frame tilt-card">
-      <iframe src="https://drive.google.com/file/d/1y1tkOhPNm5lz4PhWko7F5BdwSenHaXGY/preview" allow="autoplay"></iframe>
+      <div class="presentation-embed">
+        <iframe src="https://drive.google.com/file/d/1y1tkOhPNm5lz4PhWko7F5BdwSenHaXGY/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      </div>
+      <a class="fullscreen-btn" href="https://drive.google.com/file/d/1y1tkOhPNm5lz4PhWko7F5BdwSenHaXGY/preview" target="_blank" rel="noopener" data-i18n="presentationFullscreen">Open presentation fullscreen</a>
     </div>
-    <p class="section-footnote">Use fullscreen mode from the viewer to experience the slide deck with cinematic clarity on desktop.</p>
+    <p class="section-footnote" data-i18n="presentationFootnote">Use fullscreen mode from the viewer to experience the slide deck with cinematic clarity on desktop.</p>
+  </section>
+
+  <section class="section reveal model-section" id="model3d">
+    <div class="model-panel">
+      <div>
+        <p class="model-title" data-i18n="modelTitle">3D Engineering Model</p>
+        <p class="model-subtitle" data-i18n="modelSubtitle">Interactive Design Visualization – Team 9 Project</p>
+        <p class="section-copy" data-i18n="modelCopy">Explore the project’s engineering geometry with interactive rotation, zoom, and pan controls in a sleek glassmorphism viewer.</p>
+      </div>
+      <div class="badge-pill" data-i18n="modelBadge">Live 3D visualization</div>
+    </div>
+    <div class="model-card tilt-card">
+      <div class="model-loader" id="model-loader">
+        <span></span>
+        <div data-i18n="modelLoading">Loading 3D model...</div>
+      </div>
+      <div class="presentation-embed">
+        <iframe id="model-iframe" src="https://cad.onshape.com/documents/1b16d8c7604a6296a7a5c4c8/w/60671ee82a98298d6daaff5f/e/7c38a3dc0d21f57963cbec30?renderMode=0&uiState=6a1249f6abc7dae1993b5107f" allow="autoplay; fullscreen" allowfullscreen title="3D engineering model"></iframe>
+      </div>
+      <div class="model-controls">
+        <button class="model-button" id="reset-model" type="button" data-i18n="resetView">Reset View</button>
+        <a class="model-button" id="fullscreen-model" href="#" target="_blank" rel="noopener" data-i18n="modelFullScreen">Open Fullscreen</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal" id="components">
+    <div class="presentation-panel">
+      <div class="presentation-frame">
+        <h2 class="section-title" data-i18n="componentsTitle">Project Components</h2>
+        <p class="section-copy" data-i18n="componentsCopy">Overview of modular components, sensors, and manufacturing-ready assemblies used in Project Nexus.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal" id="manufacturing">
+    <div class="presentation-panel">
+      <div class="presentation-frame">
+        <h2 class="section-title" data-i18n="manufacturingTitle">Manufacturing Steps</h2>
+        <p class="section-copy" data-i18n="manufacturingCopy">High-level manufacturing process steps and materials used for prototyping and production readiness.</p>
+      </div>
+    </div>
   </section>
 
   <section class="section reveal" id="contact">
     <div class="grid grid-2">
       <div class="glass-card tilt-card">
-        <span class="card-label">Next step</span>
-        <h3 class="card-title">Scale the exhibition</h3>
-        <p class="card-text">Bring Project Nexus to live demonstration spaces, engineering showcases, and stakeholder presentations with a refined UI toolkit and multimedia storytelling layer.</p>
+        <span class="card-label" data-i18n="nextStepLabel">Deployment Pathway</span>
+        <h3 class="card-title" data-i18n="nextStepTitle">Scale the exhibition</h3>
+        <p class="card-text" data-i18n="nextStepText">Bring Project Nexus to live demonstration spaces, engineering showcases, and stakeholder presentations with a refined UI toolkit and multimedia storytelling layer.</p>
       </div>
       <div class="glass-card tilt-card">
-        <span class="card-label">Connect</span>
-        <h3 class="card-title">Ready for review</h3>
-        <p class="card-text">This site is built to impress technical audiences while remaining accessible and fast across modern devices.</p>
+        <span class="card-label" data-i18n="connectLabel">Project Contact</span>
+        <h3 class="card-title" data-i18n="connectTitle">Ready for review</h3>
+        <p class="card-text" data-i18n="connectText">This site is built to impress technical audiences while remaining accessible and fast across modern devices.</p>
       </div>
     </div>
   </section>
 
   <section class="section reveal team-section" id="team">
     <div class="team-card tilt-card">
-      <span class="card-label">Team Identity</span>
-      <h2 class="team-heading">Team 9 — Section 3</h2>
-      <p class="team-copy">Website Designed & Developed by</p>
-      <p class="team-name">Abdelrahman Ashraf Abdelrazek</p>
-      <p class="team-meta">University ID: 2401727</p>
-      <p class="team-note">A premium engineering portfolio presentation styled with neon cyan accents, glassmorphism depth, and smooth entrance animation for an elevated project showcase.</p>
+      <span class="card-label" data-i18n="teamLabel">Team Identity</span>
+      <h2 class="team-heading" data-i18n="teamHeading">Team 9 — Section 3</h2>
+      <p class="team-copy" data-i18n="teamCopy">Website Designed & Developed by</p>
+      <p class="team-name" data-i18n="teamName">Abdelrahman Ashraf Abdelrazek</p>
+      <p class="team-meta" data-i18n="teamMeta">University ID: 2401727</p>
+      <p class="team-note" data-i18n="teamNote">A premium engineering portfolio presentation styled with neon cyan accents, glassmorphism depth, and smooth entrance animation for an elevated project showcase.</p>
     </div>
   </section>
 
   <footer class="footer">
-    <p>© 2026 Project Nexus — Cinematic Engineering Showcase. Built for a futuristic launch experience.</p>
+    <p data-i18n="footerText">© 2026 Project Nexus — Cinematic Engineering Showcase. Built for a futuristic launch experience.</p>
   </footer>
 </div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<!-- Firebase (compat) SDKs for Realtime Database -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const revealEls = document.querySelectorAll('.reveal');
+// Graceful reveal activation: IntersectionObserver with timeout fallback
+try {
+  const obsOptions = { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.06 };
+  const io = ('IntersectionObserver' in window) ? new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('active');
+    });
+  }, obsOptions) : null;
+  revealEls.forEach(el => {
+    if (io) io.observe(el);
+    else el.classList.add('active');
+  });
+  // Ensure reveals appear after timeout even if observer fails
+  setTimeout(() => revealEls.forEach(el => el.classList.add('active')), 1200);
+} catch (err) {
+  revealEls.forEach(el => el.classList.add('active'));
+}
+
+// Global error handlers so runtime errors don't block UI
+window.addEventListener('error', (ev) => {
+  console.error('Runtime error captured:', ev.error || ev.message);
+  // ensure reveals still show
+  revealEls.forEach(el => el.classList.add('active'));
+  if (fbLoader) fbLoader.style.display = 'none';
+});
+window.addEventListener('unhandledrejection', (ev) => {
+  console.error('Unhandled promise rejection:', ev.reason);
+  revealEls.forEach(el => el.classList.add('active'));
+  if (fbLoader) fbLoader.style.display = 'none';
+});
 const hero = document.querySelector('.hero');
 const particles = [];
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('active');
-      observer.unobserve(entry.target);
+const langSwitchBtn = document.querySelector('#lang-switch');
+// Edit Mode toggle (protected)
+const editToggleBtn = document.createElement('button');
+editToggleBtn.id = 'edit-toggle';
+editToggleBtn.className = 'edit-toggle';
+editToggleBtn.type = 'button';
+editToggleBtn.textContent = 'Edit';
+const menuEl = document.querySelector('nav .menu');
+if (menuEl) menuEl.insertBefore(editToggleBtn, menuEl.children[1]);
+const soundToggleBtn = document.querySelector('#sound-toggle');
+const soundIconEl = document.querySelector('#sound-icon');
+const soundLabelEl = document.querySelector('#sound-label');
+const i18nElements = document.querySelectorAll('[data-i18n]');
+let heroPlayer;
+let currentLang = 'en';
+
+// --- Firebase setup (Realtime Database) ---
+let firebaseAvailable = false;
+let db = null;
+const firebaseConfig = {
+  apiKey: "AIzaSyDQts2-RMEYkl201x-jv7nhWPlJsskAnB4",
+  authDomain: "team-9-mdp.firebaseapp.com",
+  databaseURL: "https://team-9-mdp-default-rtdb.firebaseio.com",
+  projectId: "team-9-mdp",
+  storageBucket: "team-9-mdp.firebasestorage.app",
+  messagingSenderId: "217973676031",
+  appId: "1:217973676031:web:171e3be8df3a417441f9ca",
+  measurementId: "G-GDHMR1CBTF"
+};
+let isAdmin = false;
+let initialDataLoaded = false;
+
+// Show a small firebase loader while fetching
+const fbLoader = document.createElement('div');
+fbLoader.id = 'firebase-loader';
+fbLoader.style.position = 'fixed';
+fbLoader.style.right = '18px';
+fbLoader.style.bottom = '18px';
+fbLoader.style.padding = '10px 14px';
+fbLoader.style.borderRadius = '12px';
+fbLoader.style.background = 'rgba(0,0,0,0.6)';
+fbLoader.style.color = '#fff';
+fbLoader.style.fontWeight = '700';
+fbLoader.style.zIndex = '9999';
+fbLoader.textContent = 'Syncing...';
+fbLoader.style.display = 'none';
+document.body.appendChild(fbLoader);
+
+try {
+  if (window.firebase && typeof window.firebase.initializeApp === 'function') {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    firebaseAvailable = true;
+  } else {
+    console.warn('Firebase SDK not loaded; running in safe mode');
+  }
+} catch (err) {
+  console.warn('Firebase init failed, continuing in safe mode', err);
+  firebaseAvailable = false;
+}
+
+const translations = {
+  en: {
+    navOverview: 'Overview',
+    navPodcast: 'Podcast',
+    navPresentation: 'Presentation',
+    navModel3D: '3D Model',
+    navContact: 'Contact',
+    heroTag: 'FUTURE ENGINEERING EXPERIENCE',
+    heroTitle: 'Project Nexus: Intelligent Infrastructure',
+    heroCopy: 'A cinematic exhibition of smart engineering systems, advanced design workflows, and immersive storytelling for the next generation of infrastructure innovation.',
+    heroCtaExplore: 'Explore Project',
+    heroCtaView: 'View Presentation',
+    heroMeta1: 'Advanced modeling',
+    heroMeta2: 'Neon glass interfaces',
+    heroMeta3: 'Responsive immersion',
+    overviewTitle: 'Project Overview',
+    overviewCopy: 'Discover the core engineering vision behind Project Nexus. This exhibit blends structural innovation, embedded intelligence, and cinematic presentation to showcase a futuristic product launch experience.',
+    missionLabel: 'Mission',
+    missionTitle: 'Redefining intelligent infrastructure',
+    missionText: 'Project Nexus is a platform for high-performance systems that integrate adaptive controls, environmental sensing, and immersive visualization in one seamless experience.',
+    missionItem1: 'Smart aerospace-inspired structure',
+    missionItem2: 'Sensor-driven automation loops',
+    missionItem3: 'Data-first engineering narrative',
+    impactLabel: 'Impact',
+    impactTitle: 'Exhibition-level storytelling',
+    impactText: 'A polished, cinematic interface that presents complex engineering concepts as digestible, interactive story beats for stakeholders and technical audiences alike.',
+    badgeInnovation: 'Innovation',
+    badgeSimulation: 'Simulation',
+    badgePresentation: 'Presentation',
+    objectivesLabel: 'Objectives',
+    objectivesTitle: 'Defined goals',
+    feature1Title: 'Design modular systems',
+    feature1Text: 'for scalable engineering deployment.',
+    feature2Title: 'Streamline analytics',
+    feature2Text: 'through automated monitoring dashboards.',
+    feature3Title: 'Create immersive demos',
+    feature3Text: 'using cinematic motion and audio cues.',
+    feature4Title: 'Optimize for responsiveness',
+    feature4Text: 'across desktop and mobile devices.',
+    technologiesLabel: 'Technologies',
+    technologiesTitle: 'Future-ready stack',
+    technologiesText: 'Combining UI mastery with interactive media, the project deploys advanced web rendering, embedded audio/video, and responsive design systems.',
+    badgeDarkMode: 'Dark mode',
+    badgeGlassmorphism: 'Glassmorphism',
+    badge3D: '3D interaction',
+    podcastTitle: 'Engineering Briefing',
+    podcastCopy: 'Tune into an audio walkthrough that explains the engineering concepts, system architecture, and cinematic design behind the project.',
+    audioLabel: 'Design Briefing',
+    audioCopy: 'A futuristic podcast-style user experience combines voice narration, immersive waveform animation, and performance-focused audio controls.',
+    playBriefing: 'Play the briefing',
+    exploreInsights: 'Explore audio insights',
+    interactiveLabel: 'Control Room Interface',
+    interactiveTitle: 'Floating waveform interface',
+    interactiveText: 'The section blends a glowing audio container with motion effects and soft neon highlights to feel like a control room display.',
+    featureAudio1: 'Animated waveform background',
+    featureAudio2: 'Hover-activated glow controls',
+    featureAudio3: 'Responsive audio canvas',
+    presentationTitle: 'Engineering Presentation',
+    presentationSubtitle: 'Team 9 - Section 3 Official Report',
+    presentationCopy: 'Review the core slide deck inside a modern viewer designed for immersive project storytelling and technical demonstrations.',
+    presentationBadge: 'Full-width showcase',
+    presentationFullscreen: 'Open presentation fullscreen',
+    presentationFootnote: 'Use fullscreen mode from the viewer to experience the slide deck with cinematic clarity on desktop.',
+    componentsTitle: 'Project Components',
+    componentsCopy: 'Overview of modular components, sensors, and manufacturing-ready assemblies used in Project Nexus.',
+    manufacturingTitle: 'Manufacturing Steps',
+    manufacturingCopy: 'High-level manufacturing process steps and materials used for prototyping and production readiness.',
+    modelTitle: '3D Engineering Model',
+    modelSubtitle: 'Interactive Design Visualization – Team 9 Project',
+    modelCopy: 'Explore the project’s engineering geometry with interactive rotation, zoom, and pan controls in a sleek glassmorphism viewer.',
+    modelBadge: 'Live 3D visualization',
+    modelLoading: 'Loading 3D model...',
+    resetView: 'Reset View',
+    modelFullScreen: 'Open Fullscreen',
+    nextStepLabel: 'Deployment Pathway',
+    nextStepTitle: 'Scale the exhibition',
+    nextStepText: 'Bring Project Nexus to live demonstration spaces, engineering showcases, and stakeholder presentations with a refined UI toolkit and multimedia storytelling layer.',
+    connectLabel: 'Project Contact',
+    connectTitle: 'Ready for review',
+    connectText: 'This site is built to impress technical audiences while remaining accessible and fast across modern devices.',
+    teamLabel: 'Team Identity',
+    teamHeading: 'Team 9 — Section 3',
+    teamCopy: 'Website Designed & Developed by',
+    teamName: 'Abdelrahman Ashraf Abdelrazek',
+    teamMeta: 'University ID: 2401727',
+    teamNote: 'A premium engineering portfolio presentation styled with neon cyan accents, glassmorphism depth, and smooth entrance animation for an elevated project showcase.',
+    footerText: '© 2026 Project Nexus — Cinematic Engineering Showcase. Built for a futuristic launch experience.',
+    soundOff: 'Sound Off',
+    soundOn: 'Sound On'
+  },
+  ar: {
+    navOverview: 'نظرة عامة',
+    navPodcast: 'بودكاست',
+    navPresentation: 'عرض',
+    navContact: 'اتصال',
+    heroTag: 'تجربة هندسة المستقبل',
+    heroTitle: 'مشروع نيكسس: البنية التحتية الذكية',
+    heroCopy: 'عرض سينمائي لأنظمة الهندسة الذكية، وسير عمل التصميم المتقدم، وسرد غامر للجيل القادم من البنية التحتية.',
+    heroCtaExplore: 'استكشف المشروع',
+    heroCtaView: 'عرض العرض',
+    heroMeta1: 'نمذجة متقدمة',
+    heroMeta2: 'واجهات زجاجية نيون',
+    heroMeta3: 'تجربة استجابة',
+    overviewTitle: 'نظرة عامة على المشروع',
+    overviewCopy: 'اكتشف الرؤية الهندسية الأساسية وراء مشروع نيكسس. يجمع هذا العرض بين الابتكار الهيكلي، والذكاء المدمج، والعرض السينمائي لتقديم تجربة إطلاق مستقبلية.',
+    missionLabel: 'المهمة',
+    missionTitle: 'إعادة تعريف البنية التحتية الذكية',
+    missionText: 'مشروع نيكسس هو منصة لأنظمة عالية الأداء تدمج الضوابط التكيفية، واستشعار البيئة، والتصور الغامر في تجربة واحدة سلسة.',
+    missionItem1: 'هيكل مستوحى من الطيران الذكي',
+    missionItem2: 'حلقات أتمتة معتمدة على المستشعر',
+    missionItem3: 'سرد هندسي يركز على البيانات',
+    impactLabel: 'التأثير',
+    impactTitle: 'سرد قصصي بمستوى العرض',
+    impactText: 'واجهة مصقولة وسينمائية تعرض مفاهيم الهندسة المعقدة على هيئة لحظات سرد قابلة للفهم للجمهور الفني والتقني.',
+    badgeInnovation: 'ابتكار',
+    badgeSimulation: 'محاكاة',
+    badgePresentation: 'عرض',
+    objectivesLabel: 'الأهداف',
+    objectivesTitle: 'أهداف محددة',
+    feature1Title: 'تصميم أنظمة معيارية',
+    feature1Text: 'لنشر هندسي قابل للتوسع.',
+    feature2Title: 'تبسيط التحليلات',
+    feature2Text: 'من خلال لوحات مراقبة آلية.',
+    feature3Title: 'إنشاء عروض غامرة',
+    feature3Text: 'باستخدام الحركة السينمائية والمؤثرات الصوتية.',
+    feature4Title: 'تحسين الاستجابة',
+    feature4Text: 'عبر سطح المكتب والأجهزة المحمولة.',
+    technologiesLabel: 'التقنيات',
+    technologiesTitle: 'مجموعة جاهزة للمستقبل',
+    technologiesText: 'جمع إتقان واجهة المستخدم مع الوسائط التفاعلية، ينشر المشروع عرض الويب المتقدم والصوت والفيديو المدمجين وأنظمة التصميم المتجاوبة.',
+    badgeDarkMode: 'الوضع الداكن',
+    badgeGlassmorphism: 'الزجاجية',
+    badge3D: 'تفاعل ثلاثي الأبعاد',
+    podcastTitle: 'الموجز الهندسي',
+    podcastCopy: 'استمع إلى شرح صوتي يشرح مفاهيم الهندسة، وهيكل النظام، والتصميم السينمائي وراء المشروع.',
+    audioLabel: 'الإحاطة التصميمية',
+    audioCopy: 'تجربة بودكاست مستقبلية تجمع بين التعليق الصوتي، ورسوم الموجة الغامرة، وتحكمات صوتية عالية الأداء.',
+    playBriefing: 'تشغيل الإحاطة',
+    exploreInsights: 'استكشف الأفكار الصوتية',
+    interactiveLabel: 'واجهة غرفة التحكم',
+    interactiveTitle: 'واجهة رسم موجة عائمة',
+    interactiveText: 'يمزج القسم حاوية صوتية متوهجة مع تأثيرات حركة وإضاءات نيون ناعمة لتشعر وكأنها شاشة غرفة مراقبة.',
+    featureAudio1: 'خلفية موجة متحركة',
+    featureAudio2: 'عناصر تحكم مضيئة عند التمرير',
+    featureAudio3: 'كانفاس صوتي متجاوب',
+    presentationTitle: 'عارض هندسي',
+    presentationSubtitle: 'الفريق 9 - القسم 3 التقرير الرسمي',
+    presentationCopy: 'راجع مجموعة الشرائح الأساسية داخل عارض حديث مصمم لسرد المشروع الغامر والعروض التقنية.',
+    presentationBadge: 'عرض بعرض كامل',
+    presentationFullscreen: 'افتح العرض التقديمي بملء الشاشة',
+    presentationFootnote: 'استخدم وضع ملء الشاشة من العارض لتجربة عرض الشرائح بوضوح سينمائي على سطح المكتب.',
+    componentsTitle: 'مكونات المشروع',
+    componentsCopy: 'نظرة عامة على المكونات المعيارية وأجهزة الاستشعار والتجميعات الجاهزة للتصنيع المستخدمة في مشروع نيكسس.',
+    manufacturingTitle: 'خطوات التصنيع',
+    manufacturingCopy: 'خطوات عملية التصنيع عالية المستوى والمواد المستخدمة للنماذج الأولية وجاهزية الإنتاج.',
+    navModel3D: 'نموذج ثلاثي الأبعاد',
+    modelTitle: 'نموذج ثلاثي الأبعاد للهندسة',
+    modelSubtitle: 'تصور تصميم تفاعلي – مشروع الفريق 9',
+    modelCopy: 'استكشف هندسة المشروع التفاعلية بالدوران والتكبير والتحريك في عارض زجاجي أنيق.',
+    modelBadge: 'تجسيد ثلاثي الأبعاد مباشر',
+    modelLoading: 'جارٍ تحميل النموذج ثلاثي الأبعاد...',
+    resetView: 'إعادة تعيين العرض',
+    modelFullScreen: 'افتح بملء الشاشة',
+    nextStepLabel: 'مسار النشر',
+    nextStepTitle: 'توسيع العرض',
+    nextStepText: 'قدم مشروع نيكسس إلى مساحات العروض الحية وعروض الهندسة وعروض أصحاب المصلحة مع مجموعة أدوات واجهة مستخدم مصقولة وطبقة سرد وسائط متعددة.',
+    connectLabel: 'جهة اتصال المشروع',
+    connectTitle: 'جاهز للمراجعة',
+    connectText: 'هذا الموقع مصمم لإبهار الجماهير التقنية مع الحفاظ على إمكانية الوصول والسرعة عبر الأجهزة الحديثة.',
+    teamLabel: 'هوية الفريق',
+    teamHeading: 'الفريق 9 — القسم 3',
+    teamCopy: 'تم تصميم الموقع وتطويره بواسطة',
+    teamName: 'عبدالرحمن أشرف عبدالرازق',
+    teamMeta: 'الرقم الجامعي: 2401727',
+    teamNote: 'عرض محفظة هندسية فاخرة مصمم بلمسات سيان نيون، وعمق تأثير الزجاج، وحركة دخول سلسة لتقديم عرض مشروع راقٍ.',
+    footerText: '© 2026 مشروع نيكسس — عرض سينمائي للهندسة. مبني لتجربة إطلاق مستقبلية.',
+    soundOff: 'الصوت متوقف',
+    soundOn: 'تشغيل الصوت'
+  }
+};
+
+function onYouTubeIframeAPIReady() {
+  heroPlayer = new YT.Player('hero-video-iframe', {
+    events: {
+      onReady: (event) => {
+        event.target.mute();
+        updateSoundButton();
+      }
     }
   });
-},{threshold: 0.18});
-revealEls.forEach(el => observer.observe(el));
-if (!prefersReduced) {
+}
+
+function updateSoundButton() {
+  const isMuted = heroPlayer && typeof heroPlayer.isMuted === 'function' ? heroPlayer.isMuted() : true;
+  soundToggleBtn.classList.toggle('active', !isMuted);
+  soundIconEl.textContent = isMuted ? '🔇' : '🔊';
+  soundLabelEl.textContent = translations[currentLang][isMuted ? 'soundOff' : 'soundOn'];
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('rtl', lang === 'ar');
+  langSwitchBtn.textContent = lang === 'en' ? 'AR' : 'EN';
+  langSwitchBtn.setAttribute('aria-label', lang === 'en' ? 'Switch language to Arabic' : 'Switch language to English');
+  i18nElements.forEach(el => {
+    const key = el.dataset.i18n;
+    if (translations[lang] && translations[lang][key] !== undefined) {
+      el.textContent = translations[lang][key];
+    }
+  });
+  updateSoundButton();
+}
+
+langSwitchBtn?.addEventListener('click', () => {
+  setLanguage(currentLang === 'en' ? 'ar' : 'en');
+});
+
+soundToggleBtn?.addEventListener('click', () => {
+  if (heroPlayer && typeof heroPlayer.isMuted === 'function') {
+    if (heroPlayer.isMuted()) {
+      heroPlayer.unMute();
+      heroPlayer.setVolume(100);
+    } else {
+      heroPlayer.mute();
+    }
+    updateSoundButton();
+  }
+});
+
+const modelLoader = document.querySelector('#model-loader');
+const modelIframe = document.querySelector('#model-iframe');
+const resetModelBtn = document.querySelector('#reset-model');
+const fullscreenModelLink = document.querySelector('#fullscreen-model');
+const onshapeModelUrl = 'https://cad.onshape.com/documents/1b16d8c7604a6296a7a5c4c8/w/60671ee82a98298d6daaff5f/e/7c38a3dc0d21f57963cbec30?renderMode=0&uiState=6a1249f6abc7dae1993b5107f';
+if (fullscreenModelLink) {
+  fullscreenModelLink.href = onshapeModelUrl;
+}
+
+modelIframe?.addEventListener('load', () => {
+  if (modelLoader) {
+    modelLoader.classList.add('hidden');
+  }
+});
+
+resetModelBtn?.addEventListener('click', () => {
+  if (modelIframe) {
+    modelLoader?.classList.remove('hidden');
+    modelIframe.src = onshapeModelUrl;
+  }
+});
+
+fullscreenModelLink?.addEventListener('click', (event) => {
+  if (modelIframe) {
+    fullscreenModelLink.href = onshapeModelUrl;
+  }
+});
+
+// --- Data-binding attributes (keys used in the Realtime DB) ---
+// Add data-db attributes for editable sources if missing
+const ensureBindings = () => {
+  const heroIframe = document.querySelector('#hero-video-iframe');
+  if (heroIframe && !heroIframe.dataset.db) heroIframe.dataset.db = 'siteData/hero/videoSrc';
+  const sc = document.querySelector('.audio-embed iframe');
+  if (sc && !sc.dataset.db) sc.dataset.db = 'siteData/podcast/soundcloudSrc';
+  const pres = document.querySelector('.presentation-embed iframe');
+  if (pres && !pres.dataset.db) pres.dataset.db = 'siteData/presentation/drivePreview';
+  const mdl = document.querySelector('#model-iframe');
+  if (mdl && !mdl.dataset.db) mdl.dataset.db = 'siteData/model/onshapeUrl';
+};
+ensureBindings();
+
+// sanitize iframe URLs — only allow known providers
+function sanitizeIframeUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  const allowed = [
+    /youtube\.com\//i,
+    /youtu\.be\//i,
+    /soundcloud\.com\//i,
+    /drive\.google\.com\//i,
+    /cad\.onshape\.com\//i
+  ];
+  for (const rx of allowed) if (rx.test(url)) return url;
+  return null;
+}
+
+// Apply site data snapshot into page
+function applySiteData(snapshot) {
+  if (!snapshot) return;
+  // text translations (optional)
+  if (snapshot.translations) {
+    Object.keys(snapshot.translations).forEach(lang => {
+      Object.keys(snapshot.translations[lang]).forEach(key => {
+        if (translations[lang]) translations[lang][key] = snapshot.translations[lang][key];
+      });
+    });
+    // re-render current language
+    i18nElements.forEach(el => {
+      const key = el.dataset.i18n;
+      if (translations[currentLang] && translations[currentLang][key] !== undefined) {
+        el.textContent = translations[currentLang][key];
+      }
+    });
+  }
+
+  // simple sources
+  if (snapshot.hero && snapshot.hero.videoSrc) {
+    const hf = document.querySelector('#hero-video-iframe');
+    const safe = sanitizeIframeUrl(snapshot.hero.videoSrc);
+    if (hf && safe) hf.src = snapshot.hero.videoSrc;
+  }
+  if (snapshot.podcast && snapshot.podcast.soundcloudSrc) {
+    const sc = document.querySelector('.audio-embed iframe');
+    const safe = sanitizeIframeUrl(snapshot.podcast.soundcloudSrc);
+    if (sc && safe) sc.src = snapshot.podcast.soundcloudSrc;
+  }
+  if (snapshot.presentation && snapshot.presentation.drivePreview) {
+    const pr = document.querySelector('.presentation-embed iframe');
+    const safe = sanitizeIframeUrl(snapshot.presentation.drivePreview);
+    if (pr && safe) pr.src = snapshot.presentation.drivePreview;
+    const fs = document.querySelector('.fullscreen-btn');
+    if (fs && safe) fs.href = snapshot.presentation.drivePreview;
+  }
+  if (snapshot.model && snapshot.model.onshapeUrl) {
+    const mf = document.querySelector('#model-iframe');
+    const safe = sanitizeIframeUrl(snapshot.model.onshapeUrl);
+    if (mf && safe) mf.src = snapshot.model.onshapeUrl;
+    const fsl = document.querySelector('#fullscreen-model');
+    if (fsl && safe) fsl.href = snapshot.model.onshapeUrl;
+  }
+}
+
+// Apply default in-page content immediately so UI never stays blank
+const defaultSiteData = {
+  hero: { videoSrc: document.querySelector('#hero-video-iframe')?.src },
+  podcast: { soundcloudSrc: document.querySelector('.audio-embed iframe')?.src },
+  presentation: { drivePreview: document.querySelector('.presentation-embed iframe')?.src },
+  model: { onshapeUrl: document.querySelector('#model-iframe')?.src },
+  translations: { en: translations.en, ar: translations.ar }
+};
+applySiteData(defaultSiteData);
+
+// Listen for realtime updates if firebase is available; otherwise continue with defaults
+if (firebaseAvailable && db) {
+  try {
+    fbLoader.style.display = 'block';
+    db.ref('siteData').on('value', (snap) => {
+      try { applySiteData(snap.val()); } catch (err) { console.warn('Apply site data failed', err); }
+      if (!initialDataLoaded) {
+        initialDataLoaded = true;
+        fbLoader.style.display = 'none';
+      }
+    });
+  } catch (err) {
+    console.warn('Realtime DB listener failed, using defaults', err);
+    fbLoader.style.display = 'none';
+  }
+} else {
+  // No Firebase: hide loader and continue
+  fbLoader.style.display = 'none';
+}
+
+// Save helper with basic validation and admin check
+function saveToDb(path, value) {
+  if (!isAdmin) return Promise.reject(new Error('Not authorized'));
+  if (!firebaseAvailable || !db) return Promise.reject(new Error('Firebase not available'));
+  if (typeof path !== 'string') return Promise.reject(new Error('Invalid path'));
+  // For iframe sources sanitize
+  if (/videoSrc|soundcloudSrc|drivePreview|onshapeUrl/.test(path)) {
+    const ok = sanitizeIframeUrl(value);
+    if (!ok) return Promise.reject(new Error('URL not allowed'));
+  }
+  fbLoader.style.display = 'block';
+  return db.ref(path).set(value).finally(() => { fbLoader.style.display = 'none'; });
+}
+
+// Edit mode handlers — allow contenteditable on data-i18n elements and quick URL edits on data-db elements
+function enableEditMode() {
+  isAdmin = true;
+  editToggleBtn.textContent = 'Editing';
+  editToggleBtn.classList.add('active');
+  // make i18n elements editable for currentLang
+  i18nElements.forEach(el => {
+    el.contentEditable = true;
+    el.classList.add('editable');
+    const key = el.dataset.i18n;
+    el.addEventListener('input', el._saveHandler = (ev) => {
+      const value = el.textContent.trim();
+      saveToDb('siteData/translations/' + currentLang + '/' + key, value).catch(err => console.warn(err.message));
+    });
+  });
+  // add quick-edit for sources
+  document.querySelectorAll('[data-db]').forEach(el => {
+    el.style.outline = '2px dashed rgba(0,217,255,0.18)';
+    el.addEventListener('dblclick', el._dbl = async (ev) => {
+      ev.preventDefault();
+      const key = el.dataset.db; // path
+      const current = el.src || el.href || el.textContent || '';
+      const val = prompt('Enter new URL (allowed providers: YouTube, SoundCloud, Google Drive, Onshape):', current);
+      if (val === null) return;
+      try {
+        await saveToDb(key, val.trim());
+        // UI will update from realtime listener
+      } catch (err) {
+        alert('Save failed: ' + err.message);
+      }
+    });
+  });
+}
+
+function disableEditMode() {
+  isAdmin = false;
+  editToggleBtn.textContent = 'Edit';
+  editToggleBtn.classList.remove('active');
+  i18nElements.forEach(el => {
+    el.contentEditable = false;
+    el.classList.remove('editable');
+    if (el._saveHandler) el.removeEventListener('input', el._saveHandler);
+  });
+  document.querySelectorAll('[data-db]').forEach(el => {
+    el.style.outline = '';
+    if (el._dbl) el.removeEventListener('dblclick', el._dbl);
+  });
+}
+
+editToggleBtn.addEventListener('click', async () => {
+  if (!isAdmin) {
+    const pwd = prompt('Enter Edit Mode password');
+    if (pwd === '240001727') {
+      enableEditMode();
+      alert('Edit Mode enabled — changes save automatically. Double-click embeds to edit URLs.');
+    } else {
+      alert('Incorrect password');
+    }
+  } else {
+    if (confirm('Exit Edit Mode?')) disableEditMode();
+  }
+});
+
+// Keep translations up-to-date when switching language
+const originalSetLanguage = setLanguage;
+setLanguage = function(lang) {
+  originalSetLanguage(lang);
+  // If translations exist in DB they were merged already; but also reflect any live edits
+  i18nElements.forEach(el => {
+    const key = el.dataset.i18n;
+    if (translations[lang] && translations[lang][key] !== undefined) {
+      el.textContent = translations[lang][key];
+    }
+  });
+};
+
   const particleLayer = document.createElement('div');
   particleLayer.style.position = 'absolute';
   particleLayer.style.inset = '0';

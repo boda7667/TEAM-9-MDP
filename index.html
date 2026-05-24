@@ -1,0 +1,370 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Nexus — Cinematic Engineering Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#05060f;
+  --surface:#101424;
+  --surface-strong:#141a2b;
+  --surface-glass:rgba(12,16,28,0.72);
+  --accent:#00d9ff;
+  --accent-soft:rgba(0,217,255,0.16);
+  --text:#edf2ff;
+  --muted:#8ca3c5;
+  --border:rgba(255,255,255,0.1);
+  --radius:28px;
+  --shadow:0 30px 80px rgba(0,0,0,0.22);
+  --max-width:1240px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+button,a{font:inherit}
+img,iframe{max-width:100%;display:block}
+::selection{background:rgba(0,217,255,0.24)}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 10%,rgba(0,217,255,0.16),transparent 18%),radial-gradient(circle at 80% 40%,rgba(58,123,255,0.14),transparent 20%),radial-gradient(circle at 60% 85%,rgba(3,190,204,0.09),transparent 24%);pointer-events:none;z-index:-2}
+#page-wrap{position:relative;overflow:hidden}
+nav{position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:99;width:min(100%,1080px);padding:0 24px;display:flex;justify-content:space-between;align-items:center;gap:18px;backdrop-filter:blur(18px);background:rgba(6,9,20,0.62);border:1px solid rgba(255,255,255,0.08);border-radius:999px;box-shadow:var(--shadow)}
+nav .brand{font-family:'Orbitron',sans-serif;font-size:0.92rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--accent)}
+nav .menu{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+nav .menu a{color:var(--muted);text-decoration:none;font-size:0.92rem;transition:color .25s ease}
+nav .menu a:hover{color:var(--text)}
+.hero{position:relative;min-height:100vh;display:grid;place-items:center;padding:0 24px;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,6,15,0.22),rgba(5,6,15,0.92));pointer-events:none;z-index:1}
+.hero-video{position:absolute;inset:0;overflow:hidden;z-index:0}
+.hero-video iframe{position:absolute;inset:0;width:100%;height:100%;filter:brightness(0.52) saturate(1.15);pointer-events:none}
+.hero-content{position:relative;z-index:2;max-width:980px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.hero-tag{display:inline-flex;align-items:center;gap:10px;padding:12px 20px;border:1px solid rgba(0,217,255,0.35);border-radius:999px;background:rgba(0,217,255,0.08);color:var(--accent);font-size:0.88rem;letter-spacing:.08em;text-transform:uppercase}
+.hero-title{font-family:'Orbitron',sans-serif;font-size:min(5.4rem,11vw);line-height:0.95;letter-spacing:-0.02em;text-transform:uppercase;color:#fff;text-shadow:0 18px 60px rgba(0,0,0,0.4);transition:transform .2s ease}
+.hero-copy{max-width:720px;font-size:1.05rem;color:var(--muted);line-height:1.85}
+.cta-group{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.cta-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 34px;border-radius:999px;border:1px solid rgba(0,217,255,0.4);background:rgba(0,217,255,0.12);color:#fff;text-decoration:none;font-weight:700;letter-spacing:.02em;transition:transform .25s ease,background .25s ease,box-shadow .25s ease}
+.cta-btn:hover{transform:translateY(-2px);background:rgba(0,217,255,0.22);box-shadow:0 18px 50px rgba(0,217,255,0.2)}
+.cta-btn.secondary{border-color:rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:var(--text)}
+.hero-meta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:0.92rem;color:var(--muted);margin-top:2rem}
+.meta-pill{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04)}
+.meta-pill span{display:inline-flex;align-items:center;justify-content:center;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.section{position:relative;padding:120px 24px 80px;max-width:var(--max-width);margin:0 auto}
+.section-title{font-size:clamp(2.1rem,2.6vw,3rem);line-height:1.05;font-weight:800;letter-spacing:-0.04em;margin-bottom:10px}
+.section-copy{max-width:720px;color:var(--muted);line-height:1.9;font-size:1rem;margin-bottom:42px}
+.grid{display:grid;gap:24px}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.glass-card{position:relative;background:var(--surface-glass);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.12);box-shadow:0 30px 80px rgba(0,0,0,0.18);border-radius:32px;padding:32px;overflow:hidden;transition:transform .4s ease,box-shadow .4s ease}
+.glass-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,217,255,0.24),transparent 40%,rgba(255,255,255,0.05));pointer-events:none}
+.glass-card:hover{transform:translateY(-10px);box-shadow:0 40px 110px rgba(0,0,0,0.26)}
+.card-label{display:inline-flex;padding:8px 14px;border-radius:999px;background:rgba(0,217,255,0.1);color:var(--accent);font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px}
+.card-title{font-size:1.55rem;line-height:1.1;margin-bottom:14px;color:#fff}
+.card-text{color:var(--muted);line-height:1.85;font-size:1rem}
+.card-list{list-style:none;margin-top:22px;display:grid;gap:12px}
+.card-list li{display:flex;align-items:flex-start;gap:14px;color:var(--text);font-size:0.98rem;line-height:1.7}
+.card-list li span{width:10px;height:10px;margin-top:6px;border-radius:50%;background:var(--accent)}
+.overview-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:start}
+.overview-panel{display:grid;gap:22px}
+.overview-card{background:var(--surface-strong);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,0.18)}
+.overview-card h3{font-size:1.12rem;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:.12em}
+.overview-card p{color:var(--muted);line-height:1.85}
+.badge-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px}
+.badge-pill{padding:10px 16px;border-radius:999px;background:rgba(0,217,255,0.12);color:var(--text);font-size:0.88rem;font-weight:600}
+.feature-lists{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.feature-item{display:flex;align-items:flex-start;gap:14px;color:var(--text);line-height:1.8}
+.feature-item strong{display:block;font-size:0.95rem;margin-bottom:4px;color:#fff}
+.feature-dot{width:14px;height:14px;border-radius:50%;margin-top:5px;background:linear-gradient(135deg,var(--accent),#3d6bff)}
+.podcast{position:relative;overflow:hidden}
+.podcast::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(0,217,255,0.18),transparent 18%),radial-gradient(circle at 80% 15%,rgba(63,149,255,0.16),transparent 20%);pointer-events:none}
+.podcast-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
+.podcast-card{position:relative;background:rgba(12,16,28,0.92);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(22px);border-radius:32px;padding:32px;box-shadow:0 30px 80px rgba(0,0,0,0.24)}
+.podcast-card::after{content:'';position:absolute;inset:0;border-radius:32px;box-shadow:0 0 120px rgba(0,217,255,0.22);pointer-events:none;opacity:0.6}
+.podcast-head{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.podcast-head .marker{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px rgba(0,217,255,0.6)}
+.podcast-head h2{font-size:2rem;line-height:1.05}
+.podcast-copy{color:var(--muted);line-height:1.9;font-size:1rem;margin-bottom:18px}
+.waveform{position:relative;padding:18px 0;margin:24px 0 0;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)}
+.waveform::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,217,255,0.08),transparent);pointer-events:none}
+.audio-embed{position:relative;overflow:hidden;border-radius:26px;border:1px solid rgba(255,255,255,0.1)}
+.audio-embed iframe{height:166px}
+.podcast-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.podcast-button{padding:12px 26px;border-radius:999px;border:1px solid rgba(0,217,255,0.4);background:rgba(0,217,255,0.1);color:#fff;font-weight:700;cursor:pointer;transition:transform .25s ease,background .25s ease}
+.podcast-button:hover{transform:translateY(-2px);background:rgba(0,217,255,0.2)}
+.presentation{position:relative}
+.presentation-frame{background:rgba(12,16,28,0.94);border-radius:32px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);box-shadow:0 40px 100px rgba(0,0,0,0.28)}
+.presentation-frame iframe{width:100%;min-height:720px;border:none}
+.presentation-banner{margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.presentation-banner h2{font-size:2rem;line-height:1.05}
+.presentation-banner p{color:var(--muted);max-width:540px}
+.section-footnote{margin-top:18px;color:var(--muted);font-size:0.95rem}
+.team-section{padding:80px 24px 40px;}
+.team-card{background:rgba(6,15,28,0.78);border:1px solid rgba(0,217,255,0.18);box-shadow:0 40px 120px rgba(0,217,255,0.12);padding:44px;max-width:900px;margin:0 auto;position:relative;overflow:hidden;transition:transform .35s ease,background .35s ease,border-color .35s ease}
+.team-card::before{content:'';position:absolute;inset:-2px;background:linear-gradient(135deg,rgba(0,217,255,0.18),transparent 48%,rgba(96,196,255,0.12));pointer-events:none;filter:blur(18px)}
+.team-card:hover{transform:translateY(-10px);background:rgba(4,14,26,0.88);border-color:rgba(0,217,255,0.36)}
+.team-heading{font-family:'Orbitron',sans-serif;font-size:clamp(2.2rem,4vw,3.4rem);line-height:1.02;color:#8cfffe;text-shadow:0 0 32px rgba(0,217,255,0.25)}
+.team-copy{color:var(--accent);text-transform:uppercase;letter-spacing:.18em;font-weight:700;margin:16px 0 8px;opacity:.88}
+.team-name{font-size:clamp(1.55rem,2.2vw,2.4rem);font-weight:800;color:#e9fcff;line-height:1.1;margin-bottom:10px}
+.team-meta{color:rgba(0,217,255,0.92);font-size:1rem;letter-spacing:.08em}
+.team-note{margin-top:22px;color:var(--muted);line-height:1.8;font-size:0.98rem;max-width:680px}
+.footer{padding:48px 24px 72px;text-align:center;color:var(--muted)}
+.footer a{color:var(--accent);text-decoration:none}
+.bg-circle{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.45;pointer-events:none}
+.bg-circle.one{width:260px;height:260px;background:rgba(0,217,255,0.24);top:18%;left:4%}
+.bg-circle.two{width:360px;height:360px;background:rgba(63,149,255,0.18);bottom:10%;right:6%}
+.bg-circle.three{width:180px;height:180px;background:rgba(255,255,255,0.08);top:40%;right:16%}
+.tilt-card{transform-style:preserve-3d;transition:transform .32s ease;will-change:transform}
+.tilt-card:hover{transform:perspective(1000px) translateZ(0) rotateX(2deg) rotateY(-2deg)}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .9s ease,transform .9s ease}
+.reveal.active{opacity:1;transform:translateY(0)}
+.particle{position:absolute;border-radius:50%;pointer-events:none}
+@media(max-width:1080px){.overview-grid,.podcast-grid{grid-template-columns:1fr}}
+@media(max-width:840px){nav{left:16px;transform:none;width:calc(100% - 32px)}.hero{padding:0 16px}.hero-title{font-size:3.8rem}.hero-copy{font-size:0.98rem}.section{padding:100px 16px 60px}.section-title{font-size:2.3rem}.grid-2,.grid-3{grid-template-columns:1fr}.card-title{font-size:1.35rem}.presentation-frame iframe{min-height:620px}}
+@media(max-width:640px){nav{padding:14px 18px}.menu{gap:10px}.hero-title{font-size:2.8rem}.hero-meta{flex-direction:column}.hero-copy{max-width:100%}.cta-group{flex-direction:column}.section{padding:80px 16px 60px}.card-list li{font-size:0.95rem}.podcast-actions{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div id="page-wrap">
+  <nav>
+    <div class="brand">Apex Engineering Exhibit</div>
+    <div class="menu">
+      <a href="#overview">Overview</a>
+      <a href="#podcast">Podcast</a>
+      <a href="#presentation">Presentation</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <section class="hero" id="hero">
+    <div class="hero-video" aria-hidden="true">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/iZSwlZ-T_e8?si=WyX616Q5axPHaCdx&autoplay=1&mute=1&loop=1&playlist=iZSwlZ-T_e8&controls=0&modestbranding=1&rel=0" title="Cinematic engineering showcase" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <div class="hero-content">
+      <span class="hero-tag">FUTURE ENGINEERING EXPERIENCE</span>
+      <h1 class="hero-title">Project Nexus: Intelligent Infrastructure</h1>
+      <p class="hero-copy">A cinematic exhibition of smart engineering systems, advanced design workflows, and immersive storytelling for the next generation of infrastructure innovation.</p>
+      <div class="cta-group">
+        <a class="cta-btn" href="#overview">Explore Project</a>
+        <a class="cta-btn secondary" href="#presentation">View Presentation</a>
+      </div>
+      <div class="hero-meta">
+        <span class="meta-pill"><span></span>Advanced modeling</span>
+        <span class="meta-pill"><span></span>Neon glass interfaces</span>
+        <span class="meta-pill"><span></span>Responsive immersion</span>
+      </div>
+    </div>
+    <div class="bg-circle one"></div>
+    <div class="bg-circle two"></div>
+    <div class="bg-circle three"></div>
+  </section>
+
+  <section class="section reveal" id="overview">
+    <p class="section-title">Project Overview</p>
+    <p class="section-copy">Discover the core engineering vision behind Project Nexus. This exhibit blends structural innovation, embedded intelligence, and cinematic presentation to showcase a futuristic product launch experience.</p>
+    <div class="overview-grid">
+      <div class="overview-panel">
+        <article class="glass-card tilt-card">
+          <span class="card-label">Mission</span>
+          <h3 class="card-title">Redefining intelligent infrastructure</h3>
+          <p class="card-text">Project Nexus is a platform for high-performance systems that integrate adaptive controls, environmental sensing, and immersive visualization in one seamless experience.</p>
+          <ul class="card-list">
+            <li><span></span>Smart aerospace-inspired structure</li>
+            <li><span></span>Sensor-driven automation loops</li>
+            <li><span></span>Data-first engineering narrative</li>
+          </ul>
+        </article>
+        <article class="glass-card tilt-card">
+          <span class="card-label">Impact</span>
+          <h3 class="card-title">Exhibition-level storytelling</h3>
+          <p class="card-text">A polished, cinematic interface that presents complex engineering concepts as digestible, interactive story beats for stakeholders and technical audiences alike.</p>
+          <div class="badge-row">
+            <span class="badge-pill">Innovation</span>
+            <span class="badge-pill">Simulation</span>
+            <span class="badge-pill">Presentation</span>
+          </div>
+        </article>
+      </div>
+      <div class="overview-panel">
+        <div class="glass-card tilt-card">
+          <span class="card-label">Objectives</span>
+          <h3 class="card-title">Defined goals</h3>
+          <div class="feature-lists">
+            <div>
+              <div class="feature-item"><span class="feature-dot"></span><strong>Design modular systems</strong> for scalable engineering deployment.</div>
+              <div class="feature-item"><span class="feature-dot"></span><strong>Streamline analytics</strong> through automated monitoring dashboards.</div>
+            </div>
+            <div>
+              <div class="feature-item"><span class="feature-dot"></span><strong>Create immersive demos</strong> using cinematic motion and audio cues.</div>
+              <div class="feature-item"><span class="feature-dot"></span><strong>Optimize for responsiveness</strong> across desktop and mobile devices.</div>
+            </div>
+          </div>
+        </div>
+        <div class="glass-card tilt-card">
+          <span class="card-label">Technologies</span>
+          <h3 class="card-title">Future-ready stack</h3>
+          <p class="card-text">Combining UI mastery with interactive media, the project deploys advanced web rendering, embedded audio/video, and responsive design systems.</p>
+          <div class="badge-row">
+            <span class="badge-pill">Dark mode</span>
+            <span class="badge-pill">Glassmorphism</span>
+            <span class="badge-pill">3D interaction</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section podcast reveal" id="podcast">
+    <div class="podcast-head">
+      <div>
+        <p class="section-title">Listen to the Project Explanation</p>
+        <p class="section-copy">Tune into an audio walkthrough that explains the engineering concepts, system architecture, and cinematic design behind the project.</p>
+      </div>
+    </div>
+    <div class="podcast-grid">
+      <div class="podcast-card tilt-card">
+        <p class="card-label">Audio Narrative</p>
+        <p class="podcast-copy">A futuristic podcast-style user experience combines voice narration, immersive waveform animation, and performance-focused audio controls.</p>
+        <div class="waveform"></div>
+        <div class="audio-embed">
+          <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2326350512&color=%2300d9ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+        </div>
+        <div class="podcast-actions">
+          <button type="button" class="podcast-button">Play the briefing</button>
+          <button type="button" class="podcast-button">Explore audio insights</button>
+        </div>
+      </div>
+      <div class="podcast-card tilt-card">
+        <span class="card-label">Interactive Experience</span>
+        <h3 class="card-title">Floating waveform interface</h3>
+        <p class="card-text">The section blends a glowing audio container with motion effects and soft neon highlights to feel like a control room display.</p>
+        <ul class="card-list">
+          <li><span></span>Animated waveform background</li>
+          <li><span></span>Hover-activated glow controls</li>
+          <li><span></span>Responsive audio canvas</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal" id="presentation">
+    <div class="presentation-banner">
+      <div>
+        <p class="section-title">Presentation Viewer</p>
+        <p class="section-copy">Review the core slide deck inside a modern viewer designed for immersive project storytelling and technical demonstrations.</p>
+      </div>
+      <div class="badge-pill">Full-width showcase</div>
+    </div>
+    <div class="presentation-frame tilt-card">
+      <iframe src="https://drive.google.com/file/d/1y1tkOhPNm5lz4PhWko7F5BdwSenHaXGY/preview" allow="autoplay"></iframe>
+    </div>
+    <p class="section-footnote">Use fullscreen mode from the viewer to experience the slide deck with cinematic clarity on desktop.</p>
+  </section>
+
+  <section class="section reveal" id="contact">
+    <div class="grid grid-2">
+      <div class="glass-card tilt-card">
+        <span class="card-label">Next step</span>
+        <h3 class="card-title">Scale the exhibition</h3>
+        <p class="card-text">Bring Project Nexus to live demonstration spaces, engineering showcases, and stakeholder presentations with a refined UI toolkit and multimedia storytelling layer.</p>
+      </div>
+      <div class="glass-card tilt-card">
+        <span class="card-label">Connect</span>
+        <h3 class="card-title">Ready for review</h3>
+        <p class="card-text">This site is built to impress technical audiences while remaining accessible and fast across modern devices.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal team-section" id="team">
+    <div class="team-card tilt-card">
+      <span class="card-label">Team Identity</span>
+      <h2 class="team-heading">Team 9 — Section 3</h2>
+      <p class="team-copy">Website Designed & Developed by</p>
+      <p class="team-name">Abdelrahman Ashraf Abdelrazek</p>
+      <p class="team-meta">University ID: 2401727</p>
+      <p class="team-note">A premium engineering portfolio presentation styled with neon cyan accents, glassmorphism depth, and smooth entrance animation for an elevated project showcase.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>© 2026 Project Nexus — Cinematic Engineering Showcase. Built for a futuristic launch experience.</p>
+  </footer>
+</div>
+<script>
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const revealEls = document.querySelectorAll('.reveal');
+const hero = document.querySelector('.hero');
+const particles = [];
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('active');
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold: 0.18});
+revealEls.forEach(el => observer.observe(el));
+if (!prefersReduced) {
+  const particleLayer = document.createElement('div');
+  particleLayer.style.position = 'absolute';
+  particleLayer.style.inset = '0';
+  particleLayer.style.pointerEvents = 'none';
+  hero.appendChild(particleLayer);
+  for (let i = 0; i < 18; i++) {
+    const dot = document.createElement('div');
+    const size = 4 + Math.random() * 10;
+    dot.className = 'particle';
+    dot.style.width = `${size}px`;
+    dot.style.height = `${size}px`;
+    dot.style.background = 'rgba(0,217,255,0.75)';
+    dot.style.filter = 'blur(1px)';
+    dot.style.opacity = `${0.16 + Math.random() * 0.36}`;
+    dot.style.left = `${Math.random() * 100}%`;
+    dot.style.top = `${Math.random() * 100}%`;
+    dot.style.transform = `translate(-50%, -50%) scale(${0.6 + Math.random() * 0.8})`;
+    particleLayer.appendChild(dot);
+    particles.push({el: dot, x: Math.random()*100, y: Math.random()*100, vx:(Math.random()-0.5)*0.02, vy:(Math.random()-0.5)*0.02});
+  }
+  function animateParticles() {
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > 100) p.vx *= -1;
+      if (p.y < 0 || p.y > 100) p.vy *= -1;
+      p.el.style.left = `${p.x}%`;
+      p.el.style.top = `${p.y}%`;
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+}
+const heroTitle = document.querySelector('.hero-title');
+hero.addEventListener('mousemove', (event) => {
+  if (prefersReduced) return;
+  const x = (event.clientX / window.innerWidth - 0.5) * 16;
+  const y = (event.clientY / window.innerHeight - 0.5) * 16;
+  heroTitle.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+});
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY / 5;
+  hero.style.backgroundPosition = `center ${scrolled}px`;
+});
+const tiltCards = document.querySelectorAll('.tilt-card');
+tiltCards.forEach(card => {
+  card.addEventListener('mousemove', (event) => {
+    if (prefersReduced) return;
+    const rect = card.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * 8;
+    const rotateY = ((x - centerX) / centerX) * -8;
+    card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
+  });
+});
+</script>
+</body>
+</html>
